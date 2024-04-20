@@ -3,8 +3,12 @@ package com.shoppingmall.preorder.controller;
 import com.shoppingmall.preorder.config.JwtFilter;
 import com.shoppingmall.preorder.config.SecurityUtil;
 import com.shoppingmall.preorder.config.TokenProvider;
+import com.shoppingmall.preorder.domain.User;
+import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
+import com.shoppingmall.preorder.dto.ChangepwDto;
 import com.shoppingmall.preorder.dto.LoginDto;
 import com.shoppingmall.preorder.dto.TokenDto;
+import com.shoppingmall.preorder.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -13,9 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @PostMapping("/authenticate")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
@@ -55,10 +62,19 @@ public class AuthController {
 
 
     //주소, 전화번호 업데이트
+    @PatchMapping("/change_addressNphonenumber")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public String changeAddressNPhoneNumber(@RequestBody ChangeAddressNPhoneDto changeAddressNPhoneDto){
+       // logger.info("user 정보 ::::: {}",user.toString());
+        if(userService.changeAddressNPhoneNumber(changeAddressNPhoneDto).isEmpty())
+            return "해당 유저 없음";
+        else return "주소와 전화번호 수정완료됨";
+    }
 
     //비밀번호 업데이트
 //    @PatchMapping("/change_password")
-//    public boolean changePasswrd(@Validated @RequestBody ChangepwDto changepwDto){
+//    public boolean changePassword(@Validated @RequestBody ChangepwDto changepwDto){
+//
 //
 //    }
 }

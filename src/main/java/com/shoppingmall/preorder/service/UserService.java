@@ -3,6 +3,7 @@ package com.shoppingmall.preorder.service;
 import com.shoppingmall.preorder.config.SecurityUtil;
 import com.shoppingmall.preorder.domain.Authority;
 import com.shoppingmall.preorder.domain.User;
+import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
 import com.shoppingmall.preorder.dto.UserDto;
 import com.shoppingmall.preorder.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +60,16 @@ public class UserService {
     public Optional<User> getMyUserWithAuthorities() {
         return SecurityUtil.getCurrentUsername()
                 .flatMap(userRepository::findOneWithAuthoritiesByUsername);
+    }
+
+    @Transactional
+    public Optional<User> changeAddressNPhoneNumber(ChangeAddressNPhoneDto changeAddressNPhoneDto){
+        Optional<User> temp = SecurityUtil.getCurrentUsername()
+                .flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        if(temp.isPresent()){
+            userRepository.updateAddressNPhone(changeAddressNPhoneDto,temp.get().getUserId());
+        }
+        return temp;
+
     }
 }

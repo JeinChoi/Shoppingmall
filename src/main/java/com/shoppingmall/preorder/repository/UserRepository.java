@@ -2,6 +2,7 @@ package com.shoppingmall.preorder.repository;
 
 
 import com.shoppingmall.preorder.domain.User;
+import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,17 @@ public class UserRepository {
 //                .setParameter("password", memberPw)
 //                .executeUpdate();
 //    }
+
+    public long updateAddressNPhone(ChangeAddressNPhoneDto changeAddressNPhoneDto,long userId){
+        return em.createQuery("update User as u set u.city = :city, u.street = :street, u.zipcode = :zipcode ," +
+                        "u.phoneNumber = :phoneNumber where u.userId= :userId")
+                .setParameter("city",changeAddressNPhoneDto.getCity())
+                .setParameter("street", changeAddressNPhoneDto.getStreet())
+                .setParameter("zipcode", changeAddressNPhoneDto.getZipcode())
+                .setParameter("phoneNumber",changeAddressNPhoneDto.getPhoneNumber())
+                .setParameter("userId",userId)
+                .executeUpdate();
+    }
 
 }
 
