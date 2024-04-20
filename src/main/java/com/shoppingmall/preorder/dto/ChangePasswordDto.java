@@ -9,13 +9,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDto {
+public class ChangePasswordDto {
 
     @NotNull
-    @Size(min = 3, max = 50)
-    private String email;
-
-    @NotNull
-    @Size(min = 3, max = 100)
     private String password;
 }

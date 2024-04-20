@@ -4,6 +4,7 @@ import com.shoppingmall.preorder.config.SecurityUtil;
 import com.shoppingmall.preorder.domain.Authority;
 import com.shoppingmall.preorder.domain.User;
 import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
+import com.shoppingmall.preorder.dto.ChangePasswordDto;
 import com.shoppingmall.preorder.dto.UserDto;
 import com.shoppingmall.preorder.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,9 @@ public class UserService {
         if (userRepository.findOneWithAuthoritiesByUsername(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }//이메일이 이미 있다면 예외처리
+
+        //
+
 
         // 가입되어 있지 않은 회원이면,
         // 권한 정보 만들고
@@ -72,4 +76,16 @@ public class UserService {
         return temp;
 
     }
+
+    @Transactional
+    public Optional<User> changePassword(ChangePasswordDto changePasswordDto){
+        Optional<User> temp = SecurityUtil.getCurrentUsername()
+                .flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        if(temp.isPresent()){
+            userRepository.updatePassword(changePasswordDto,temp.get().getUserId());
+        }
+        return temp;
+
+    }
+
 }

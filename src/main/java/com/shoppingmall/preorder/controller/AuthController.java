@@ -4,10 +4,7 @@ import com.shoppingmall.preorder.config.JwtFilter;
 import com.shoppingmall.preorder.config.SecurityUtil;
 import com.shoppingmall.preorder.config.TokenProvider;
 import com.shoppingmall.preorder.domain.User;
-import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
-import com.shoppingmall.preorder.dto.ChangepwDto;
-import com.shoppingmall.preorder.dto.LoginDto;
-import com.shoppingmall.preorder.dto.TokenDto;
+import com.shoppingmall.preorder.dto.*;
 import com.shoppingmall.preorder.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +32,11 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    @PostMapping("/authenticate")
+    @PostMapping("/authenticate")//로그인기능. 레더스 없이 구현했으니 로그아웃은 context에서 삭제해주면 되는거 아닌가....??
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
         // authenticate 메소드가 실행이 될 때 CustomUserDetailsService class의 loadUserByUsername 메소드가 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -65,16 +62,19 @@ public class AuthController {
     @PatchMapping("/change_addressNphonenumber")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public String changeAddressNPhoneNumber(@RequestBody ChangeAddressNPhoneDto changeAddressNPhoneDto){
-       // logger.info("user 정보 ::::: {}",user.toString());
+
         if(userService.changeAddressNPhoneNumber(changeAddressNPhoneDto).isEmpty())
-            return "해당 유저 없음";
+            return "주소와 전화번호 수정 실패";
         else return "주소와 전화번호 수정완료됨";
     }
 
     //비밀번호 업데이트
-//    @PatchMapping("/change_password")
-//    public boolean changePassword(@Validated @RequestBody ChangepwDto changepwDto){
-//
-//
-//    }
+    @PatchMapping("/change_password")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public String changePassword(@RequestBody ChangePasswordDto changePasswordDto){
+        // logger.info("user 정보 ::::: {}",user.toString());
+        if(userService.changePassword(changePasswordDto).isEmpty())
+            return "비밀번호 수정 실패";
+        else return "비밀번호 수정완료됨";
+    }
 }

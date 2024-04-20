@@ -3,6 +3,7 @@ package com.shoppingmall.preorder.repository;
 
 import com.shoppingmall.preorder.domain.User;
 import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
+import com.shoppingmall.preorder.dto.ChangePasswordDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,12 @@ public class UserRepository {
                    .getResultList();
             return findUser.stream().findAny();
     }
-
+public Optional<User> findOneWithAuthoritiesByEmail(String email){
+    List<User> findUser = em.createQuery("select u from User u where u.email= :email", User.class)
+            .setParameter("email",email)
+            .getResultList();
+    return findUser.stream().findAny();
+}
     public List<User> findAll() {
         List<User> members = em.createQuery("select m from User m", User.class).getResultList();
         return members;
@@ -61,6 +67,12 @@ public class UserRepository {
                 .setParameter("street", changeAddressNPhoneDto.getStreet())
                 .setParameter("zipcode", changeAddressNPhoneDto.getZipcode())
                 .setParameter("phoneNumber",changeAddressNPhoneDto.getPhoneNumber())
+                .setParameter("userId",userId)
+                .executeUpdate();
+    }
+    public long updatePassword(ChangePasswordDto changePasswordDto, long userId){
+        return em.createQuery("update User as u set u.password = :password where u.userId= :userId")
+                .setParameter("password",changePasswordDto.getPassword())
                 .setParameter("userId",userId)
                 .executeUpdate();
     }
