@@ -17,11 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -52,4 +49,16 @@ public class AuthController {
         // tokenDto를 이용해 response body에도 넣어서 리턴
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
+    //이메일 인증 : 처음에 이메일만 입력해서 인증받는다고 가정하자
+    //여기서 이메일이 이미 있는지에 대한 유무도 다 정해야하다
+    ///userservice에 있는 예외처리문을 여기서 써주기.
+
+
+    //주소, 전화번호 업데이트
+
+    //비밀번호 업데이트
+//    @PatchMapping("/change_password")
+//    public boolean changePasswrd(@Validated @RequestBody ChangepwDto changepwDto){
+//
+//    }
 }

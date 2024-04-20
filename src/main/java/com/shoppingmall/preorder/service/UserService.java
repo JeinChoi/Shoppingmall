@@ -22,9 +22,9 @@ public class UserService {
 
     @Transactional
     public User signup(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).isPresent()) {
+        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
-        }
+        }//이메일이 이미 있다면 예외처리
 
         // 가입되어 있지 않은 회원이면,
         // 권한 정보 만들고
@@ -36,7 +36,11 @@ public class UserService {
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
-                .nickname(userDto.getNickname())
+                .phoneNumber(userDto.getPhoneNumber())
+                .email(userDto.getEmail())
+                .city(userDto.getCity())
+                .street(userDto.getStreet())
+                .zipcode(userDto.getZipcode())
                 .authorities(Collections.singleton(authority))
                 .activated(true)
                 .build();

@@ -23,5 +23,23 @@ public class UserDto {
 
     @NotNull
     @Size(min = 3, max = 50)
-    private String nickname;
+    private String phoneNumber;
+
+    @NotNull
+    @Size(min = 3, max = 50)
+    private String email;
+
+    @NotNull
+    @Size(min = 3, max = 50)
+    private String city;
+
+    @NotNull
+    @Size(min = 3, max = 50)
+    private String street;
+
+    @NotNull
+    @Size(min = 3, max = 50)
+    private String zipcode;
+
+
 }

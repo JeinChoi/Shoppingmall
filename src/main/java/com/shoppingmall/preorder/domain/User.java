@@ -29,12 +29,28 @@ public class User {
     @Column(name = "password", length = 100)
     private String password;
 
-    @Column(name = "nickname", length = 50)
-    private String nickname;
+    @Column(name = "phoneNumber", length = 50)
+    private String phoneNumber;
 
     @JsonIgnore
     @Column(name = "activated")
     private boolean activated;
+
+    @JsonIgnore
+    @Column(name = "email")
+    private String email;
+
+    @JsonIgnore
+    @Column(name = "city")
+    private String city;
+
+    @JsonIgnore
+    @Column(name = "street")
+    private String street;
+
+    @JsonIgnore
+    @Column(name = "zipcode")
+    private String zipcode;
 
     @ManyToMany
     @JoinTable(
