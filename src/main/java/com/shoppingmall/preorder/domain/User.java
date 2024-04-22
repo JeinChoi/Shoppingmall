@@ -3,6 +3,8 @@ package com.shoppingmall.preorder.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -14,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
     @JsonIgnore
     @Id // primary key
@@ -52,10 +55,21 @@ public class User {
     @Column(name = "zipcode")
     private String zipcode;
 
-    @ManyToMany
+    @JsonIgnore
+    @Column(name = "emailAuthenticationToken")
+    private String email_authentication_token;
+
+
+    @ManyToOne
     @JoinTable(
             name = "user_authority",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
-    private Set<Authority> authorities;
+    private Authority authority;
+
+    public void updateAuthorityToUser(){
+
+        this.authority= new Authority("ROLE_USER");
+        logger.info("수정 후에 authority {}",this.authority.getAuthorityName());
+    }
 }

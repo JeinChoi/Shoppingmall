@@ -23,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api")
@@ -34,6 +36,12 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @PostMapping("/authenticate")//로그인기능. 레더스 없이 구현했으니 로그아웃은 context에서 삭제해주면 되는거 아닌가....??
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
+        //받은 email로 유저 정보를 가져와서 그 유저의 권한이 ROLE_USER인 경우에만 로그인 가능
+        //GUEST인 경우 즉 메일 인증을 아직 받지 않은 유저의 경우 로그인이 불가하다.
+        Optional<User> findUser =userService.getUserWithAuthorities(loginDto.getEmail());
+        if(findUser.isEmpty()||!findUser.get().getAuthority().getAuthorityName().equals("ROLE_USER")){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());

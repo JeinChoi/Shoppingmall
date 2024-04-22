@@ -41,5 +41,9 @@ public class UserDto {
     @Size(min = 3, max = 50)
     private String zipcode;
 
+    private String email_authentication_token;
 
+    public void updateEamilAuthenticationToken(String email_authentication_token){
+        this.email_authentication_token=email_authentication_token;
+    }
 }

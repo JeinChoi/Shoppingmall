@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,19 +24,38 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<User> signup(
             @Valid @RequestBody UserDto userDto
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(userService.signup(userDto));
     }
+    @Transactional
+    @GetMapping("/verify")
+    public String verifyEmail(@RequestParam String email,
+                              @RequestParam String token) {
+        Optional<User> user= userService.verifyEmail(email);
+        if(user.get().getEmail_authentication_token().equals(token)){
+            //권한 바꾸고
+            user.ifPresent(u->{
+                u.updateAuthorityToUser();
+            });
+            //token 컬럼 비워주기...??
+            logger.info("인증이 완료도니ㅏ????? {} {}",email,token);
+            return "인증완료";
+        }
+        //유저가 없다면
+        logger.info("인증이 안되나????? {} {}",email,token);
+        return "인증실패";
 
+
+    }
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<User> getMyUserInfo() {
         return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
     }
 
-    @GetMapping("/user/{username}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserWithAuthorities(username).get());
-    }
+//    @GetMapping("/user/{username}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+//    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
+//        return ResponseEntity.ok(userService.getUserWithAuthorities(username).get());
+//    }
 }
