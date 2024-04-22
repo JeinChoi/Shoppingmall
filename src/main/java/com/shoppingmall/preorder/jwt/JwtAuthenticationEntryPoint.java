@@ -1,4 +1,4 @@
-package com.shoppingmall.preorder.config;
+package com.shoppingmall.preorder.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

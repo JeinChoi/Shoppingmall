@@ -1,5 +1,7 @@
 package com.shoppingmall.preorder.config;
 
+import com.shoppingmall.preorder.jwt.JwtFilter;
+import com.shoppingmall.preorder.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

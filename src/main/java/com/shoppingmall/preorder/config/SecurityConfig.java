@@ -1,8 +1,10 @@
 package com.shoppingmall.preorder.config;
 
+import com.shoppingmall.preorder.jwt.JwtAccessDeniedHandler;
+import com.shoppingmall.preorder.jwt.JwtAuthenticationEntryPoint;
+import com.shoppingmall.preorder.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,8 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.logging.Logger;
 
 @Configuration
 @EnableWebSecurity
@@ -57,6 +57,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/signup").permitAll() // 회원가입 api
                 .requestMatchers("/favicon.ico").permitAll()
                 .requestMatchers("/api/verify").permitAll()
+                .requestMatchers("/items/list").permitAll()
                 .anyRequest().authenticated() // 그 외 인증 없이 접근X
 
                 .and()

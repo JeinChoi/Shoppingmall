@@ -1,8 +1,7 @@
 package com.shoppingmall.preorder.controller;
 
-import com.shoppingmall.preorder.config.JwtFilter;
-import com.shoppingmall.preorder.config.SecurityUtil;
-import com.shoppingmall.preorder.config.TokenProvider;
+import com.shoppingmall.preorder.jwt.JwtFilter;
+import com.shoppingmall.preorder.jwt.TokenProvider;
 import com.shoppingmall.preorder.domain.User;
 import com.shoppingmall.preorder.dto.*;
 import com.shoppingmall.preorder.service.UserService;
@@ -18,9 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
