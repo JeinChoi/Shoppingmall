@@ -3,10 +3,13 @@ package com.shoppingmall.preorder.config;
 import com.shoppingmall.preorder.jwt.JwtAccessDeniedHandler;
 import com.shoppingmall.preorder.jwt.JwtAuthenticationEntryPoint;
 import com.shoppingmall.preorder.jwt.TokenProvider;
+import com.shoppingmall.preorder.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,7 +25,7 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
+    private final RedisService redisService;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
     // PasswordEncoder는 BCryptPasswordEncoder를 사용
     @Bean
@@ -63,7 +66,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated() // 그 외 인증 없이 접근X
 
                 .and()
-                .apply(new JwtSecurityConfig(tokenProvider)); // JwtFilter를 addFilterBefore로 등록했던 JwtSecurityConfig class 적용
+                .apply(new JwtSecurityConfig(tokenProvider,redisService)); // JwtFilter를 addFilterBefore로 등록했던 JwtSecurityConfig class 적용
 
         logger.info("securityconfig파일??? ");
         return httpSecurity.build();
