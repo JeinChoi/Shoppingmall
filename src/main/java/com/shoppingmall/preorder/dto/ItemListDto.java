@@ -17,7 +17,7 @@ public class ItemListDto {
 
     private long price;
 
-    private String stockQuantity;
+    private int stockQuantity;
 
 
 }

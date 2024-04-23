@@ -57,7 +57,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/signup").permitAll() // 회원가입 api
                 .requestMatchers("/favicon.ico").permitAll()
                 .requestMatchers("/api/verify").permitAll()
+                .requestMatchers("/items/listdata").permitAll()
                 .requestMatchers("/items/list").permitAll()
+                .requestMatchers("/items/detail/**").permitAll()
                 .anyRequest().authenticated() // 그 외 인증 없이 접근X
 
                 .and()

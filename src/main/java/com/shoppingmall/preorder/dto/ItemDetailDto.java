@@ -17,7 +17,9 @@ public class ItemDetailDto {
 
     private long price;
 
-    private String stockQuantity;
+    private int stockQuantity;
+
+    private String itemStateName;
 
     private String detail;
 

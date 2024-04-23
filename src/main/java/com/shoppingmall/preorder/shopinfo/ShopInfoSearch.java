@@ -32,8 +32,8 @@ public class ShopInfoSearch {
                 .encode().build().toUri();
 
         RestTemplate restTemplate = new RestTemplate();
-        RequestEntity<Void> requestEntity = RequestEntity.get(uri).header("X-Naver-Client-Id", "")
-                .header("X-Naver-Client-Secret", "").build();
+        RequestEntity<Void> requestEntity = RequestEntity.get(uri).header("X-Naver-Client-Id", "WCYpJGoVkvYJFnuRhMzB")
+                .header("X-Naver-Client-Secret", "zqAdjv_STY").build();
         ResponseEntity<String> result = restTemplate.exchange(requestEntity, String.class);
 
 
@@ -42,10 +42,10 @@ public class ShopInfoSearch {
         return response;
     }
 
-    public static void main(String[] args) {
-        ShopInfoSearch naverShopSearch = new ShopInfoSearch();
-        naverShopSearch.search();
-    }
+//    public static void main(String[] args) {
+//        ShopInfoSearch naverShopSearch = new ShopInfoSearch();
+//        naverShopSearch.search();
+//    }
 
     public List<Item> fromJSONtoItems(String result)  {
         // 문자열 정보를 JSONObject로 바꾸기

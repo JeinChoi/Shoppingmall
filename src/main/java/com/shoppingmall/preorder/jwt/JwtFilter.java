@@ -31,6 +31,7 @@ public class JwtFilter extends GenericFilterBean {
         String requestURI = httpServletRequest.getRequestURI();
         logger.info("????????????????{}",jwt);
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+            //로그아웃된 토큰임에도(redis에 저장이 됐음에도) 요청이 들어왔을시. false 반환
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
