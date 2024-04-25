@@ -6,6 +6,8 @@ import lombok.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity // DB의 테이블과 1:1 매핑되는 객체
@@ -66,6 +68,9 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Authority authority;
+
+//    @OneToMany(mappedBy = "orders")
+//    private List<Order> orderList = new ArrayList<>();
 
     public void updateAuthorityToUser(){
 

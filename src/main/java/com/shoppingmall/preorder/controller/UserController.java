@@ -2,6 +2,8 @@ package com.shoppingmall.preorder.controller;
 
 import com.shoppingmall.preorder.config.SecurityConfig;
 import com.shoppingmall.preorder.domain.User;
+import com.shoppingmall.preorder.dto.ChangeAddressNPhoneDto;
+import com.shoppingmall.preorder.dto.ChangePasswordDto;
 import com.shoppingmall.preorder.dto.UserDto;
 import com.shoppingmall.preorder.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,38 +24,13 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
     private final RedisTemplate<String,String> redisTemplate;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserController.class);
-    @PostMapping("/signup")
-    public ResponseEntity<User> signup(
-            @Valid @RequestBody UserDto userDto
-    ) throws Exception {
-        return ResponseEntity.ok(userService.signup(userDto));
-    }
-    @Transactional
-    @GetMapping("/verify")
-    public String verifyEmail(@RequestParam String email,
-                              @RequestParam String token) {
-        Optional<User> user= userService.verifyEmail(email);
-        if(user.get().getEmail_authentication_token().equals(token)){
-            //권한 바꾸고
-            user.ifPresent(u->{
-                u.updateAuthorityToUser();
-            });
-            //token 컬럼 비워주기...??
-            logger.info("인증이 완료도니ㅏ????? {} {}",email,token);
-            return "인증완료";
-        }
-        //유저가 없다면
-        logger.info("인증이 안되나????? {} {}",email,token);
-        return "인증실패";
 
-
-    }
-    @GetMapping("/user")
+    @GetMapping("/userInfo")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<User> getMyUserInfo() {
         return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
@@ -68,10 +45,23 @@ public class UserController {
         valueOperations.set(bearerToken.substring(7),"logout");
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    //주소, 전화번호 업데이트
+    @PatchMapping("/change_addressNphonenumber")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public String changeAddressNPhoneNumber(@RequestBody ChangeAddressNPhoneDto changeAddressNPhoneDto){
 
-//    @GetMapping("/user/{username}")
-//    @PreAuthorize("hasAnyRole('ADMIN')")
-//    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
-//        return ResponseEntity.ok(userService.getUserWithAuthorities(username).get());
-//    }
+        if(userService.changeAddressNPhoneNumber(changeAddressNPhoneDto).isEmpty())
+            return "주소와 전화번호 수정 실패";
+        else return "주소와 전화번호 수정완료됨";
+    }
+
+    //비밀번호 업데이트
+    @PatchMapping("/change_password")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public String changePassword(@RequestBody ChangePasswordDto changePasswordDto){
+        // logger.info("user 정보 ::::: {}",user.toString());
+        if(userService.changePassword(changePasswordDto).isEmpty())
+            return "비밀번호 수정 실패";
+        else return "비밀번호 수정완료됨";
+    }
 }

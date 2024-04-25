@@ -18,20 +18,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    @PostMapping("/authenticate")//로그인기능. 레더스 없이 구현했으니 로그아웃은 context에서 삭제해주면 되는거 아닌가....??
+    @PostMapping("/login")//로그인기능. 레더스 없이 구현했으니 로그아웃은 context에서 삭제해주면 되는거 아닌가....??
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
         //받은 email로 유저 정보를 가져와서 그 유저의 권한이 ROLE_USER인 경우에만 로그인 가능
         //GUEST인 경우 즉 메일 인증을 아직 받지 않은 유저의 경우 로그인이 불가하다.
@@ -61,7 +62,32 @@ public class AuthController {
     //이메일 인증 : 처음에 이메일만 입력해서 인증받는다고 가정하자
     //여기서 이메일이 이미 있는지에 대한 유무도 다 정해야하다
     ///userservice에 있는 예외처리문을 여기서 써주기.
+    @PostMapping("/signup")
+    public ResponseEntity<User> signup(
+            @Valid @RequestBody UserDto userDto
+    ) throws Exception {
+        return ResponseEntity.ok(userService.signup(userDto));
+    }
+    @Transactional
+    @GetMapping("/verify")
+    public String verifyEmail(@RequestParam String email,
+                              @RequestParam String token) {
+        Optional<User> user= userService.verifyEmail(email);
+        if(user.get().getEmail_authentication_token().equals(token)){
+            //권한 바꾸고
+            user.ifPresent(u->{
+                u.updateAuthorityToUser();
+            });
+            //token 컬럼 비워주기...??
+            logger.info("인증이 완료도니ㅏ????? {} {}",email,token);
+            return "인증완료";
+        }
+        //유저가 없다면
+        logger.info("인증이 안되나????? {} {}",email,token);
+        return "인증실패";
 
+
+    }
 
     //주소, 전화번호 업데이트
     @PatchMapping("/change_addressNphonenumber")

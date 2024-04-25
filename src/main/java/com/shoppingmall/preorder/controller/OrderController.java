@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/order")
 @RequiredArgsConstructor
-public class ItemController {
+public class OrderController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserService userService;
@@ -42,8 +42,8 @@ public class ItemController {
     private final ItemListRepository itemListRepository;
     private final ItemService itemService;
     private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
-    @GetMapping("/listdata")//db 저장용
-    public ResponseEntity<?> getShoppingInfo() {
+    @GetMapping("/")//db 저장용
+    public ResponseEntity<?> orderItems(OrderDto orderDto) {
 
         String result = shopInfoSearch.search();
 
@@ -52,18 +52,19 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
+    @PostMapping
     //상품 리스트와 상세 조회 기능은 회원가입이 필요없이 가능하다
     @GetMapping("/list")
     public ResponseEntity<?> list(){
         List<Item> list = itemService.findAll();
 
         List<ItemListDto> resultList = list.stream().map(i ->{
-          try{
-              return new ItemListDto(i.getItemName(),i.getPrice(),i.getStockQuantity());
-          } catch (Exception e){
-              e.printStackTrace();
-          }
-          return null;
+            try{
+                return new ItemListDto(i.getItemName(),i.getPrice(),i.getStockQuantity());
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
 
         }).toList();
         return new ResponseEntity<>(resultList,HttpStatus.OK);
@@ -77,7 +78,7 @@ public class ItemController {
                 item.getStockQuantity(),
                 item.getItemStateName(),
                 item.getDetail()
-                );
+        );
         return new ResponseEntity<>(itemDetailDto, HttpStatus.OK);
 
     }

@@ -50,7 +50,7 @@ public class UserService {
                 + "<h1> 안녕하세요. Artify 입니다</h1>"
                 + "<br>"
                 + "<p>아래 링크를 클릭하면 이메일 인증이 완료됩니다.<p>"
-                + "<a href='http://localhost:8081/api/verify?email="+receiverMail+"&token=" + userDto.getEmail_authentication_token() + "'>인증 링크</a>"
+                + "<a href='http://localhost:8081/auth/verify?email="+receiverMail+"&token=" + userDto.getEmail_authentication_token() + "'>인증 링크</a>"
                 + "</div>";
 
         message.setText(body, "utf-8", "html");// 내용, charset 타입, subtype
