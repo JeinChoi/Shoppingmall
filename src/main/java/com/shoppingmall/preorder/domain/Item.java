@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity // DB의 테이블과 1:1 매핑되는 객체
@@ -56,6 +58,11 @@ public class Item {
     @Column(name = "modified_at")
     private Timestamp modifiedAt;
 
+    @OneToOne(mappedBy="wishitem_item")
+    WishItem wishitem_item;
+
+    @OneToMany(mappedBy = "orderItem_item")
+    List<OrderItem> orderItemList = new ArrayList<>();
 
     public Item(String itemName, long price, int stockQuantity, String detail, String itemStateName) {
         this.itemName=itemName;

@@ -69,8 +69,12 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Authority authority;
 
-//    @OneToMany(mappedBy = "orders")
-//    private List<Order> orderList = new ArrayList<>();
+    @OneToMany(mappedBy = "order_user")
+    private List<Order> orderList = new ArrayList<>();
+
+    @OneToMany(mappedBy="wishItem_user")
+    private List<WishItem> wishItemList = new ArrayList<>();
+
 
     public void updateAuthorityToUser(){
 
