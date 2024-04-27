@@ -62,7 +62,7 @@ public class ShopInfoSearch {
             JSONObject itemJson = (JSONObject) items.get(i);
             Item item = new Item(
                     itemJson.getString("title"),//itemName
-                    Long.parseLong(itemJson.getString("lprice")),//price
+                    Integer.parseInt(itemJson.getString("lprice")),//price
                     10,//stockQuantity
                     itemJson.getString("brand"),//detail(brand)
                     "ON_SALE"//itemStateName

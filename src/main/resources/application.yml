@@ -13,7 +13,7 @@ spring:
     password: 1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -29,6 +29,6 @@ jwt:
   token-validity-in-seconds: 86400000 # ttl (초)
 
 email:
-  username:
-  password:
+  username: shoppingmall_auth
+  password: shopping113
 

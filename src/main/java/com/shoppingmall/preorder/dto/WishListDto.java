@@ -7,8 +7,6 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDto {
-    long userId; //주문한 사용자 정보
-    long itemId;
-    int count;
+public class WishListDto {
+    long userId;
 }

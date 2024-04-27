@@ -34,7 +34,7 @@ public class Item {
     private String itemName;
 
     @Column(name = "price")
-    private long price;
+    private int price;
 
     @JsonIgnore
     @Column(name = "stock_quantity")
@@ -64,12 +64,28 @@ public class Item {
     @OneToMany(mappedBy = "orderItem_item")
     List<OrderItem> orderItemList = new ArrayList<>();
 
-    public Item(String itemName, long price, int stockQuantity, String detail, String itemStateName) {
+    public Item(String itemName, int price, int stockQuantity, String detail, String itemStateName) {
         this.itemName=itemName;
         this.price=price;
         this.stockQuantity=stockQuantity;
         this.detail=detail;
         this.itemStateName=itemStateName;
 
+    }
+
+    public void addStock(int quantity) {
+        this.stockQuantity += quantity;
+    }
+
+    /**
+     * stock 감소
+     */
+    public void removeStock(int quantity) {
+        int restStock = this.stockQuantity - quantity;
+        if (restStock < 0) {
+            throw new RuntimeException();
+
+        }
+        this.stockQuantity = restStock;
     }
 }

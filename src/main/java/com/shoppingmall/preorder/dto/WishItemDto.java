@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDto {
+public class WishItemDto {
     long userId; //주문한 사용자 정보
     long itemId;
     int count;

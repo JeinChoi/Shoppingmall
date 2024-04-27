@@ -92,6 +92,11 @@ public class UserService {
         return userRepository.findOneWithAuthoritiesByEmail(email);
     }
 
+    @Transactional
+    public User findUser(long userId){
+        return userRepository.findOne(userId);
+    }
+
     // 현재 securityContext에 저장된 username의 정보만 가져오는 메소드
     @Transactional(readOnly = true)
     public Optional<User> getMyUserWithAuthorities() {
