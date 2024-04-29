@@ -42,12 +42,16 @@ public class Order {
 
     @OneToMany(mappedBy = "orderItems_order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
-    public Order(User order_user,String deliveryStatus,String city,String street,String zipcode,OrderItem orderItem){
+    public Order(User order_user,String deliveryStatus,String city,String street,String zipcode,List<OrderItem> orderItemList){
         this.order_user = order_user;
         this.deliveryStatus=deliveryStatus;
         this.city=city;
         this.street=street;
         this.zipcode=zipcode;
-        orderItems.add(orderItem);
+        for(OrderItem orderItem : orderItemList){
+            orderItem.setOrderItems_order(this);
+        }
     }
+
+    //하나하나 setOrder를 안해줘서 안된거였음.... setorder해줘야함 order가져와서 orderitem생성할 때 order설정 필요하다.
 }

@@ -62,7 +62,6 @@ public class User {
     @Column(name = "emailAuthenticationToken")
     private String email_authentication_token;
 
-
     @ManyToOne
     @JoinTable(
             name = "user_authority",

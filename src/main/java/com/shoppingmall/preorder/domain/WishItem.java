@@ -42,10 +42,15 @@ public class WishItem {
 
     public static WishItem createWishItem(User user, Item wishitem_item, int orderPrice, int count){
         WishItem wishItem = new WishItem();
-        wishItem.setOrderPrice(orderPrice);
+        wishItem.setOrderPrice(orderPrice*count);
         wishItem.setWishitem_item(wishitem_item);
         wishItem.setUser(user);
         wishItem.setCount(count);
         return wishItem;
+    }
+    public void updateWishItem(int count){
+        this.count=count;
+        this.orderPrice=count*orderPrice;
+
     }
 }

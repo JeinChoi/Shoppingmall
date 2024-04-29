@@ -14,6 +14,6 @@ import java.util.List;
 public interface WishItemRepository extends JpaRepository<WishItem, Long> {
 
  //   @Query("select w from WishItem w where w.wishItem_user.userId = : wishItem_user.userId")
-
+    WishItem findById(long wishItemId);
     List<WishItem> findAllByUser(User user);
 }

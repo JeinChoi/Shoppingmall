@@ -16,15 +16,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender javaMailSender;
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserService.class);
     @Transactional
@@ -34,19 +35,25 @@ public class OrderService {
 
     @Transactional
     public void save(OrderItem orderItem){
-        orderRepository.saveOrderItem(orderItem);
+        orderItemRepository.save(orderItem);
     }
 
     @Transactional
-    public void order(OrderDto orderDto){
+    public void orderDto(OrderDto orderDto){
         User findUser = userRepository.findOne(orderDto.getUserId());
         Item findItem = itemRepository.findOne(orderDto.getItemId());
         //주문상품 생성
+        List<OrderItem> orderItemList = new ArrayList<>();
         OrderItem orderItem = OrderItem.createOrderItem(findItem,findItem.getPrice(), orderDto.getCount());
-        orderItemRepository.save(orderItem);
-        Order order = new Order(findUser,"ON_DELIVERY",findUser.getCity(), findUser.getStreet(), findUser.getZipcode(),orderItem);
+        orderItemList.add(orderItem);
+        orderItemRepository.saveAll(orderItemList);
+        Order order = new Order(findUser,"ON_DELIVERY",findUser.getCity(), findUser.getStreet(), findUser.getZipcode(),orderItemList);
         orderRepository.save(order);
-
     }
 
+    @Transactional
+    public void order(User findUser,List<OrderItem> orderItemList,Order order){
+        orderItemRepository.saveAll(orderItemList);
+        orderRepository.save(order);
+    }
 }

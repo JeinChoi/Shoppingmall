@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItem {
+
     @Id@GeneratedValue
     @Column(name="order_item_id")
     private long orderItemId;
@@ -24,8 +25,6 @@ public class OrderItem {
     private int orderPrice; //count에 따라 다를 것
 
     private int count;
-
-    private String itemStatus;
 
     @CreationTimestamp
     private Timestamp createdAt;
@@ -45,7 +44,7 @@ public class OrderItem {
 
     public static OrderItem createOrderItem(Item item,int orderPrice, int count) {
         OrderItem orderItem = new OrderItem();
-       // orderItem.setOrderItems_order(orderItems_order);
+//      orderItem.setOrderItems_order(orderItems_order);
         orderItem.setOrderItem_item(item);
         orderItem.setOrderPrice(orderPrice);
         orderItem.setCount(count);
@@ -53,4 +52,18 @@ public class OrderItem {
         item.removeStock(count);
         return orderItem;
     }
+
+//    public OrderItem(int orderPrice, int count, String itemStatus,
+//                     Timestamp createdAt,
+//                     Timestamp modifiedAt,
+//                     Order orderItems_order,
+//                     Item orderItem_item) {
+//        this.orderPrice = orderPrice;
+//        this.count = count;
+//        this.itemStatus = itemStatus;
+//        this.createdAt = createdAt;
+//        this.modifiedAt = modifiedAt;
+//        this.orderItems_order = orderItems_order;
+//        this.orderItem_item = orderItem_item;
+//    }
 }

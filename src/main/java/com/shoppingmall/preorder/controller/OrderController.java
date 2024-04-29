@@ -77,7 +77,7 @@ public class OrderController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<?> order(@RequestBody OrderDto orderDto){
         //토큰 검사 및 dto에 상품 id, 개수, 주소, 전화번호 필요
-        orderService.order(orderDto);
+        orderService.orderDto(orderDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
