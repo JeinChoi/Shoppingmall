@@ -1,0 +1,84 @@
+package com.shoppingmall.productservice.controller;
+
+import com.shoppingmall.productservice.domain.Item;
+import com.shoppingmall.productservice.dto.FindItemDto;
+import com.shoppingmall.productservice.dto.ItemDetailDto;
+import com.shoppingmall.productservice.dto.ItemListDto;
+import com.shoppingmall.productservice.dto.feignClientDto.ItemFeignResponse;
+import com.shoppingmall.productservice.repository.ItemListRepository;
+import com.shoppingmall.productservice.service.ItemService;
+import com.shoppingmall.productservice.shopinfo.ShopInfoSearch;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+
+@RestController
+@RequestMapping("/item")
+@RequiredArgsConstructor
+public class ItemController {
+    private final ShopInfoSearch shopInfoSearch;
+    private final ItemListRepository itemListRepository;
+    private final ItemService itemService;
+    private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
+    @GetMapping("/listdata")//db 저장용
+    public ResponseEntity<?> getShoppingInfo() {
+
+        String result = shopInfoSearch.search();
+
+        List<Item> list = shopInfoSearch.fromJSONtoItems(result);
+        itemListRepository.saveAll(list);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+    //상품 리스트와 상세 조회 기능은 회원가입이 필요없이 가능하다
+    @GetMapping("/list")
+    public ResponseEntity<?> list(){
+        List<Item> list = itemService.findAll();
+
+        List<ItemListDto> resultList = list.stream().map(i ->{
+          try{
+              return new ItemListDto(i.getItemName(),i.getPrice(),i.getStockQuantity());
+          } catch (Exception e){
+              e.printStackTrace();
+          }
+          return null;
+
+        }).toList();
+        return new ResponseEntity<>(resultList,HttpStatus.OK);
+    }
+    @PostMapping("/bringItem")
+    ItemFeignResponse findItemById(@RequestBody FindItemDto findItemDto){
+
+        Optional<Item> result = itemService.findOne(findItemDto.getItemId());
+        Item findItem = result.get();
+        return new ItemFeignResponse(findItem.getItemId(),
+                findItem.getItemName(), findItem.getPrice(),
+                findItem.getStockQuantity(),
+                findItem.getDetail(),
+                findItem.getItemStateName(),
+                findItem.getCreatedAt(),
+                findItem.getModifiedAt());
+    }
+    @GetMapping("/detail/{itemId}")
+    public ResponseEntity<?> productDetail(@PathVariable("itemId") Long itemId){
+        Optional<Item> result = itemService.findOne(itemId);
+        Item item = result.get();
+        ItemDetailDto itemDetailDto = new ItemDetailDto(
+                item.getItemName(),
+                item.getPrice(),
+                item.getStockQuantity(),
+                item.getItemStateName(),
+                item.getDetail()
+                );
+        return new ResponseEntity<>(itemDetailDto, HttpStatus.OK);
+
+    }
+
+}
