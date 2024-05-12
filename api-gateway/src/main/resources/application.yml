@@ -25,6 +25,9 @@ spring:
             - Path=/order/**
           filters:
             - RewritePath=/order/(?<segment>.*), /$\{segment}
+#          metadata:
+#            connect-timeout: 10000
+#            response-timeout: 10000
 eureka:
   instance:
     prefer-ip-address: true

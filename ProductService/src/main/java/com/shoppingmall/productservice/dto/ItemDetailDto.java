@@ -1,4 +1,5 @@
 package com.shoppingmall.productservice.dto;
+import com.shoppingmall.productservice.domain.ItemState;
 import lombok.*;
 
 @Getter
@@ -15,7 +16,7 @@ public class ItemDetailDto {
 
     private int stockQuantity;
 
-    private String itemStateName;
+    private ItemState itemStateName;
 
     private String detail;
 

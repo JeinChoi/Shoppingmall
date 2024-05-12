@@ -3,6 +3,7 @@ package com.shoppingmall.orderservice.controller;
 
 import com.shoppingmall.orderservice.dto.FindItemDto;
 import com.shoppingmall.orderservice.dto.FindUserDto;
+import com.shoppingmall.orderservice.dto.ItemUpdateDto;
 import com.shoppingmall.orderservice.dto.WishListDto;
 import com.shoppingmall.orderservice.dto.feignClientDto.ItemFeignResponse;
 import com.shoppingmall.orderservice.dto.feignClientDto.WishItemListDto;
@@ -24,4 +25,8 @@ public interface ItemFeignClient {
 
     @DeleteMapping(path="/wish/deleteList")
     void deleteAllWishList (@RequestBody WishListDto wishListDto);
+
+    @PostMapping(path="/item/updateState")
+    void updateState(@RequestBody ItemUpdateDto itemUpdateDto);
+
 }

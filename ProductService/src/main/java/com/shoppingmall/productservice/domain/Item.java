@@ -41,10 +41,7 @@ public class Item {
     @Column(name = "detail")
     private String detail;
 
-//    @ManyToOne
-//    @JoinTable(name = "item_state")
-    @Column(name="item_state_name")
-    private String itemStateName;
+    private ItemState itemState;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -61,12 +58,12 @@ public class Item {
 //    @OneToMany(mappedBy = "orderItem_item",cascade = CascadeType.ALL)
 //    List<OrderItem> orderItemList = new ArrayList<>();
 
-    public Item(String itemName, int price, int stockQuantity, String detail, String itemStateName) {
+    public Item(String itemName, int price, int stockQuantity, String detail, ItemState itemState) {
         this.itemName=itemName;
         this.price=price;
         this.stockQuantity=stockQuantity;
         this.detail=detail;
-        this.itemStateName=itemStateName;
+        this.itemState=itemState;
 
     }
 
@@ -84,5 +81,9 @@ public class Item {
 
         }
         this.stockQuantity = restStock;
+    }
+
+    public void updateStateToSoldout(){
+        this.itemState = ItemState.SOLD_OUT;
     }
 }

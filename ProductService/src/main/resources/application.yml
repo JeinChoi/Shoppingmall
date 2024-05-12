@@ -19,6 +19,9 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  redis:
+    host: localhost
+    port: 6379
 eureka:
   instance:
     prefer-ip-address: true

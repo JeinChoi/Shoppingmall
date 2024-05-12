@@ -1,5 +1,6 @@
 package com.shoppingmall.productservice.dto.feignClientDto;
 
+import com.shoppingmall.productservice.domain.ItemState;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -21,7 +22,7 @@ public class ItemFeignResponse {
 
     private String detail;
 
-    private String itemStateName;
+    private ItemState itemState;
 
     private Timestamp createdAt;
 

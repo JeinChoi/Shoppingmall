@@ -22,6 +22,12 @@ public class ItemService {
     }
 
     @Transactional
+    public void updateState(Long itemId){
+        Item findItem = itemRepository.findById(itemId).get();
+        findItem.updateStateToSoldout();
+
+    }
+    @Transactional
     public List<Item> findAll() {
         return itemRepository.findAll();
     }

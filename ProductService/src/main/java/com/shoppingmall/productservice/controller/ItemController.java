@@ -4,13 +4,17 @@ import com.shoppingmall.productservice.domain.Item;
 import com.shoppingmall.productservice.dto.FindItemDto;
 import com.shoppingmall.productservice.dto.ItemDetailDto;
 import com.shoppingmall.productservice.dto.ItemListDto;
+import com.shoppingmall.productservice.dto.ItemUpdateDto;
 import com.shoppingmall.productservice.dto.feignClientDto.ItemFeignResponse;
 import com.shoppingmall.productservice.repository.ItemListRepository;
 import com.shoppingmall.productservice.service.ItemService;
+import com.shoppingmall.productservice.service.RedisService;
 import com.shoppingmall.productservice.shopinfo.ShopInfoSearch;
+import jakarta.inject.Qualifier;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +30,7 @@ public class ItemController {
     private final ShopInfoSearch shopInfoSearch;
     private final ItemListRepository itemListRepository;
     private final ItemService itemService;
+    private final RedisService redisService;
     private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
     @GetMapping("/listdata")//db 저장용
     public ResponseEntity<?> getShoppingInfo() {
@@ -36,6 +41,23 @@ public class ItemController {
         itemListRepository.saveAll(list);
         return new ResponseEntity<>(HttpStatus.OK);
 
+    }
+    @PostMapping("/storage")
+    public ResponseEntity<?> manageStorage(){
+        List<Item> list = itemService.findAll();
+        for(Item item : list){
+            redisService.setValues((item.getItemId()+""),(item.getStockQuantity()+""));
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @GetMapping("/stock/{itemId}")
+    public int stockQuantity(@PathVariable(name="itemId") String itemId){
+        return Integer.parseInt(redisService.getValues(itemId));
+    }
+
+    @PostMapping("/updateState")
+    public void updateState(@RequestBody ItemUpdateDto itemUpdateDto){
+        itemService.updateState(itemUpdateDto.getItemId());
     }
     //상품 리스트와 상세 조회 기능은 회원가입이 필요없이 가능하다
     @GetMapping("/list")
@@ -62,7 +84,7 @@ public class ItemController {
                 findItem.getItemName(), findItem.getPrice(),
                 findItem.getStockQuantity(),
                 findItem.getDetail(),
-                findItem.getItemStateName(),
+                findItem.getItemState(),
                 findItem.getCreatedAt(),
                 findItem.getModifiedAt());
     }
@@ -74,7 +96,7 @@ public class ItemController {
                 item.getItemName(),
                 item.getPrice(),
                 item.getStockQuantity(),
-                item.getItemStateName(),
+                item.getItemState(),
                 item.getDetail()
                 );
         return new ResponseEntity<>(itemDetailDto, HttpStatus.OK);

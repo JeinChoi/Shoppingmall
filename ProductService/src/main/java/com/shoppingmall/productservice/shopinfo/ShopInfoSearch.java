@@ -1,6 +1,7 @@
 package com.shoppingmall.productservice.shopinfo;
 
 import com.shoppingmall.productservice.domain.Item;
+import com.shoppingmall.productservice.domain.ItemState;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.RequestEntity;
@@ -61,7 +62,7 @@ public class ShopInfoSearch {
                     Integer.parseInt(itemJson.getString("lprice")),//price
                     10,//stockQuantity
                     itemJson.getString("brand"),//detail(brand)
-                    "ON_SALE"//itemStateName
+                    ItemState.ON_SALE//itemStateName
                     );
             itemList.add(item);
 
