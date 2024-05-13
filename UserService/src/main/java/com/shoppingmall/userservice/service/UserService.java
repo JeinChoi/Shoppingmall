@@ -76,7 +76,7 @@ public class UserService {
                 .city(userDto.getCity())
                 .street(userDto.getStreet())
                 .zipcode(userDto.getZipcode())
-                .authority(authority)
+                //.authority(authority)
                 .email_authentication_token(userDto.getEmail_authentication_token())
                 .activated(true)
                 .build();
@@ -87,10 +87,10 @@ public class UserService {
     public Optional<User> verifyEmail(String email){
         return userRepository.findByEmail(email);
     }
-    @Transactional
-    public void updateAuthority(User user){
-        user.updateAuthorityToUser();
-    }
+//    @Transactional
+//    public void updateAuthority(User user){
+//        user.updateAuthorityToUser();
+//    }
     // 유저,권한 정보를 가져오는 메소드
 //    @Transactional(readOnly = true)
 //    public Optional<User> getUserWithAuthorities(String email) {

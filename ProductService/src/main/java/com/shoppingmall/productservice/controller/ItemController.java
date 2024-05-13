@@ -1,10 +1,7 @@
 package com.shoppingmall.productservice.controller;
 
 import com.shoppingmall.productservice.domain.Item;
-import com.shoppingmall.productservice.dto.FindItemDto;
-import com.shoppingmall.productservice.dto.ItemDetailDto;
-import com.shoppingmall.productservice.dto.ItemListDto;
-import com.shoppingmall.productservice.dto.ItemUpdateDto;
+import com.shoppingmall.productservice.dto.*;
 import com.shoppingmall.productservice.dto.feignClientDto.ItemFeignResponse;
 import com.shoppingmall.productservice.repository.ItemListRepository;
 import com.shoppingmall.productservice.service.ItemService;
@@ -103,4 +100,13 @@ public class ItemController {
 
     }
 
+    //재고 처리하는 부분
+    //order에서 주문을 하면 여기로 가져와서 redis삭제함. 그리고 일정시간 지나면 db로 반영 해줄거임.
+    //itemid, count 그리고 plus가 true면 재고에 더해주는거 false면 뺴주는거.
+//    @PostMapping("/manage")
+//    public ResponseEntity<?> manageItem(@RequestBody ManageProductDto manageProductDto){
+//        itemService.manageItem(manageProductDto);
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 }

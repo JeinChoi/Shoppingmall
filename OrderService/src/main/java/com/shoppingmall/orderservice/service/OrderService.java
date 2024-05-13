@@ -17,6 +17,8 @@ import com.shoppingmall.orderservice.repository.OrderItemRepository;
 import com.shoppingmall.orderservice.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.sql.Timestamp;
+import java.util.concurrent.TimeUnit;
+
 import static com.shoppingmall.orderservice.domain.DeliveryStatus.READY;
 import static com.shoppingmall.orderservice.domain.OrderStatus.START;
 
@@ -39,6 +43,8 @@ public class OrderService {
     private final RedisService redisService;
     private final ItemFeignClient itemFeignClient;
     private final UserFeignClient userFeignClient;
+
+    private final RedissonClient redissonClient;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     public void save(Order order) {
@@ -58,7 +64,7 @@ public class OrderService {
         OrderItem orderItem = OrderItem.createOrderItem(orderItemDto.getItemId(), itemFeignResponse.getPrice(), orderItemDto.getCount());
 
         int presentStock = Integer.parseInt(redisService.getValues(orderItemDto.getItemId()+""));
-//presentstock가 0인 경우도 분기처리 필요
+        //presentstock가 0인 경우도 분기처리 필요
 
         if(presentStock<orderItemDto.getCount())
             throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다");
@@ -66,18 +72,46 @@ public class OrderService {
         int updateStock = presentStock-orderItemDto.getCount();
         if(updateStock==0)
             itemFeignClient.updateState(new ItemUpdateDto(orderItemDto.getItemId()));
-        redisService.setValues(orderItemDto.getItemId()+"",updateStock+""); //만약 여기서 false가 반환되면 item 상태는 품절로 바뀌고 주문 실패 띄우기
-        //애초에 품절 상태면 상세보기에서 구매도 안되도록 처리해야한다
-        //만약 주문 수량이 재고량 보다 많으면
+        //
+        String lockName = "ITEM" + orderItemDto.getItemId();
+        RLock rLock = redissonClient.getLock(lockName);
 
-        orderItemRepository.save(orderItem);
+        long waitTime = 5L;
+        long leaseTime = 3L;
+        TimeUnit timeUnit = TimeUnit.SECONDS;
+        try {
+            boolean available = rLock.tryLock(waitTime, leaseTime, timeUnit);
+            if(!available){
+                logger.info("lock 획득 실패={}",lockName);
+                throw new RuntimeException();
+            }
+            redisService.setValues(orderItemDto.getItemId()+"",updateStock+""); //만약 여기서 false가 반환되면 item 상태는 품절로 바뀌고 주문 실패 띄우기
+            //애초에 품절 상태면 상세보기에서 구매도 안되도록 처리해야한다
+            //만약 주문 수량이 재고량 보다 많으면
+
+        }catch (InterruptedException e){
+            //락을 얻으려고 시도하다가 인터럽트를 받았을 때 발생하는 예외
+            throw new RuntimeException();
+        }finally{
+            try{
+                rLock.unlock();
+                logger.info("unlock complete: {}", rLock.getName());
+            }catch (IllegalMonitorStateException e){
+                //이미 종료된 락일 때 발생하는 예외
+                throw new RuntimeException();
+            }
+        }
+        //
+    //    redisService.setValues(orderItemDto.getItemId()+"",updateStock+"");
+     //   orderItemRepository.save(orderItem);
         Order order = new Order(
                 orderItemDto.getUserId(), READY, OrderStatus.READY,
                 orderItem,userFeignResponse.getCity(),
                 userFeignResponse.getStreet(),userFeignResponse.getZipcode());
 
         orderRepository.save(order);
-
+        redisService.setValues(orderItemDto.getItemId()+"",updateStock+"");
+        //이부분 product feign client로 바꾸기 캐싱 처리하는 부분. 여기서 안할거임
         return order.getOrderId();
     }
     public void updateOrderStatus(OrderIdDto orderIdDto){
@@ -159,7 +193,7 @@ public class OrderService {
         //where 조건절에 시간을 비교하는 sql문을 생성
 
         //가져온 orderlist의 주문 수량
-
+        //삭제 처리 전. 재고 수정 해줘야함
         orderRepository.deleteAll(orderList);
     }
 }

@@ -1,6 +1,7 @@
 package com.shoppingmall.productservice.service;
 
 import com.shoppingmall.productservice.domain.Item;
+import com.shoppingmall.productservice.dto.ManageProductDto;
 import com.shoppingmall.productservice.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
-
+    private final RedisService redisService;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ItemService.class);
     @Transactional
     public Optional<Item> findOne(Long itemId) {
@@ -32,4 +33,18 @@ public class ItemService {
         return itemRepository.findAll();
     }
 
+//    @Transactional
+//    public void manageItem(ManageProductDto manageProductDto){
+//        int left = Integer.parseInt(redisService.getValues(manageProductDto.getItemId()+""));
+//        if (left==0){
+//            decrementInDB(manageProductDto);
+//        }else decrementInRedis(manageProductDto,left);
+//    }
+//
+//    private void decrementInDB(ManageProductDto manageProductDto){
+//
+//    }
+//    private void decrementInRedis(ManageProductDto manageProductDto,int left){
+//
+//    }
 }

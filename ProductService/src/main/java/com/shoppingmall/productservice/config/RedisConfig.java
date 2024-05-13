@@ -1,9 +1,11 @@
 package com.shoppingmall.productservice.config;
 
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,10 +19,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @RequiredArgsConstructor
 @EnableRedisRepositories
+@EnableCaching
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
-
+    private RedissonClient redissonClient;
     // lettuce
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -32,6 +35,7 @@ public class RedisConfig {
     @Primary
     public RedisTemplate<String,String> redisTemplate() {
         RedisTemplate<String, String> storageTemplate = new RedisTemplate<>();
+
         storageTemplate.setConnectionFactory(redisConnectionFactory());   //connection
         storageTemplate.setKeySerializer(new StringRedisSerializer());    // key
         storageTemplate.setValueSerializer(new StringRedisSerializer());  // value

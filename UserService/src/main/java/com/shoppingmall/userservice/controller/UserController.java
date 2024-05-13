@@ -46,7 +46,7 @@ public class UserController {
         Optional<User> user= userService.verifyEmail(email);
         if(user.get().getEmail_authentication_token().equals(token)){
             //권한 바꾸고
-            userService.updateAuthority(user.get());
+        //    userService.updateAuthority(user.get());
 
             logger.info("인증이 완료 {} {}",email,token);
             return "인증완료";
