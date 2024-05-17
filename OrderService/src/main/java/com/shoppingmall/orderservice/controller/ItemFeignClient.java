@@ -1,10 +1,7 @@
 package com.shoppingmall.orderservice.controller;
 
 
-import com.shoppingmall.orderservice.dto.FindItemDto;
-import com.shoppingmall.orderservice.dto.FindUserDto;
-import com.shoppingmall.orderservice.dto.ItemUpdateDto;
-import com.shoppingmall.orderservice.dto.WishListDto;
+import com.shoppingmall.orderservice.dto.*;
 import com.shoppingmall.orderservice.dto.feignClientDto.ItemFeignResponse;
 import com.shoppingmall.orderservice.dto.feignClientDto.WishItemListDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -28,5 +25,8 @@ public interface ItemFeignClient {
 
     @PostMapping(path="/item/updateState")
     void updateState(@RequestBody ItemUpdateDto itemUpdateDto);
+
+    @PostMapping(path="/item/manage")
+    void updateStock(@RequestBody UpdateStockDto updateStockDto);
 
 }

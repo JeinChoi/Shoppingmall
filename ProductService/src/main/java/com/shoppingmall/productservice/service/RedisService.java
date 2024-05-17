@@ -43,6 +43,10 @@ public class RedisService {
         return values.get(key);
     }
 
+    public String getAndDelete(String key){
+        ValueOperations<String,String> values = storageTemplate.opsForValue();
+        return values.getAndDelete(key);
+    }
     public void deleteValues(String key) {
         storageTemplate.delete(key);
     }

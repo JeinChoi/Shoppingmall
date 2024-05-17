@@ -37,6 +37,10 @@ public class Item {
     @Column(name = "stock_quantity")
     private int stockQuantity;
 
+//    @JsonIgnore
+//    @Column(name="live_stock")
+//    private int liveStock;
+
     @JsonIgnore
     @Column(name = "detail")
     private String detail;
@@ -83,6 +87,9 @@ public class Item {
         this.stockQuantity = restStock;
     }
 
+    public void updateStock(long count,boolean plus){
+        this.stockQuantity+=(count*(plus?1:-1));
+    }
     public void updateStateToSoldout(){
         this.itemState = ItemState.SOLD_OUT;
     }

@@ -26,6 +26,8 @@ public class OrderItem {
     @GeneratedValue
     @Column(name="order_item_id")
     private long orderItemId;
+    @Version
+    private Long version;
 
     private int price;
 

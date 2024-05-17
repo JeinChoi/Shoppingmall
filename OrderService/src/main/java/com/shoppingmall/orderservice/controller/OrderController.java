@@ -2,27 +2,14 @@ package com.shoppingmall.orderservice.controller;
 
 import com.shoppingmall.orderservice.dto.*;
 import com.shoppingmall.orderservice.service.OrderService;
-import com.shoppingmall.orderservice.service.RedisService;
-import feign.Response;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +19,11 @@ public class OrderController {
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
 
+    @PatchMapping("/refund")
+    public ResponseEntity<?> refundItem(@RequestBody RefundOrderDto refundOrderDto){
+        boolean possible = orderService.refund(refundOrderDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @PostMapping("/order")//READY
     public ResponseEntity<?> orderItem(@RequestBody OrderItemDto orderItemDto){
         //토큰 검사 및 dto에 상품 id, 개수, 주소, 전화번호 필요

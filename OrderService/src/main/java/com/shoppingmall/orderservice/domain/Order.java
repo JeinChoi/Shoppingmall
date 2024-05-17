@@ -2,6 +2,7 @@ package com.shoppingmall.orderservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
-import static com.shoppingmall.orderservice.domain.OrderStatus.COMPLETED;
-import static com.shoppingmall.orderservice.domain.OrderStatus.START;
+import static com.shoppingmall.orderservice.domain.OrderStatus.*;
 
 @Entity
 @Table(name = "orders")
@@ -25,7 +25,8 @@ public class Order {
     @GeneratedValue
     @Column(name="order_id")
     private Long orderId;
-
+@Version
+private Long version;
 //    @ManyToOne
 //    @JoinColumn(name="user_id")
 //    private User order_user;
@@ -33,7 +34,7 @@ public class Order {
 
    // private long orderItemId;
     //OrderItem
-   @OneToOne(fetch = FetchType.LAZY)
+   @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
    @JoinColumn(name="order_item_id")
    private OrderItem orderItem;
 
@@ -70,6 +71,7 @@ public class Order {
             case START:
                 this.orderStatus = COMPLETED;
                 break;
+
         }
 
     }
@@ -77,4 +79,12 @@ public class Order {
         this.deliveryStatus = deliveryStatus;
     }
     //하나하나 setOrder를 안해줘서 안된거였음.... setorder해줘야함 order가져와서 orderitem생성할 때 order설정 필요하다.
+
+    public void updateOrderStatusToRefund(){
+        this.orderStatus=REFUND;
+    }
+    public void updateOrderStatusToRefundCompleted(){this.orderStatus=REFUND_COMPLETED;}
+    public void updateOrderStatusToRefundImpossible(){
+        this.orderStatus=REFUND_IMPOSSIBLE;
+    }
 }
