@@ -1,10 +1,13 @@
 ### 📢 프로젝트 소개
+-----------------
 
-> 고객이 상품을 구매하고, 구매함에 따라 재고, 배송 관리를 해주는 서비스입니다.
-> 모듈을 분리했기 때문에 개별 배포가 가능하고 장애 격리가 수월합니다.
+- 고객이 상품을 구매하고, 구매함에 따라 재고, 배송 관리를 해주는 서비스입니다.
+
+- 모듈을 분리했기 때문에 개별 배포가 가능하고 장애 격리가 수월합니다.
 </br>
 
 ### 📢 기술 스택
+-----------------
 
 - SpringBoot, Spring Security
   
@@ -16,17 +19,19 @@
 </br>
 
 ### 📢 개발 환경
+-----------------
 
 - Version: Java 21
-  
+
 - Framework: SpringBoot 3.2.2
-  
+
 - Database: MySQL 8.0
-  
+
 - ORM: JPA
 </br>
 
 ### 📢 주요 기능
+-----------------
 
 - API Gateway를 통해 MSA로 구현. 서비스 기능별로 분리
   
@@ -44,17 +49,18 @@
   - 주문 후 2일: 배송 완료
 - 환불 상태 관리
   
-  - 배송 이전에 환불 가능
-    
+  - 배송 이전에 환불 가능    
   - 환불 후 1일: 환불한 상품의 재고 반영
   </br>  
 
 ### 📢 ERD
+-----------------
 ![ERD](https://github.com/JeinChoi/Shoppingmall/assets/59508337/b424afbb-e6ee-4f59-a1ba-9221f38cf5c3)
 
 </br>
 
 ### 📢 트러블 슈팅
+-----------------
 <details>
 <summary> 장바구니 전체 주문 기능 구현 시 발생 </summary>
 <div markdown="1">
@@ -62,9 +68,9 @@
 문제</br>
 - 장바구니 내에 있는 상품 전체 주문 후에 장바구니를 비우려고 할 때 오류 발생
 - 
-    
     ```
     Expecting a SELECT Query [org.hibernate.query.sqm.tree.select.SqmSelectStatement], but found org.hibernate.query.sqm.tree.delete.SqmDeleteStatement
+
     ```
 
 원인</br>    
@@ -112,5 +118,5 @@
 </details>
 
 ### ⏱️ 개발 기간
-
+-----------------
 2024.04.17~
