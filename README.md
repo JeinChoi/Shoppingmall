@@ -1,25 +1,25 @@
+
 ### 📢 프로젝트 소개
------------------
+---
 
 - 고객이 상품을 구매하고, 구매함에 따라 재고, 배송 관리를 해주는 서비스입니다.
 
-- 모듈을 분리했기 때문에 개별 배포가 가능하고 장애 격리가 수월합니다.
-</br>
+- MSA 서비스이기 때문에 개별 배포가 가능하고 장애 격리가 수월합니다.
 
-### 📢 기술 스택
------------------
-
-- SpringBoot, Spring Security
-  
-- Spring cloud (API Gateway, Eureka Server), JWT
-  
-- JPA/Hibernate, Redis
-  
-- Docker
+- 
 </br>
 
 ### 📢 개발 환경
------------------
+
+![java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![spring boot](https://img.shields.io/badge/-Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![spring cloud](https://img.shields.io/badge/-Spring%20Cloud-6DB33F?style=for-the-badge&logo=icloud&logoColor=white)
+![spring security](https://img.shields.io/badge/-Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![My SQL](https://img.shields.io/badge/-My%20SQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/-redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Redis](https://img.shields.io/badge/-docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+</br>
 
 - Version: Java 21
 
@@ -27,11 +27,11 @@
 
 - Database: MySQL 8.0
 
-- ORM: JPA
+- ORM: JPA/Hibernate
 </br>
 
 ### 📢 주요 기능
------------------
+---
 
 - API Gateway를 통해 MSA로 구현. 서비스 기능별로 분리
   
@@ -44,23 +44,22 @@
 - Redis에 Redisson 분산락 활용
   
 - 주문 상태 관리
-  
   - 주문 후 1일: 배송 중
   - 주문 후 2일: 배송 완료
+
 - 환불 상태 관리
-  
   - 배송 이전에 환불 가능    
   - 환불 후 1일: 환불한 상품의 재고 반영
   </br>  
 
 ### 📢 ERD
------------------
+---
 ![ERD](https://github.com/JeinChoi/Shoppingmall/assets/59508337/b424afbb-e6ee-4f59-a1ba-9221f38cf5c3)
 
 </br>
 
 ### 📢 트러블 슈팅
------------------
+---
 <details>
 <summary> 장바구니 전체 주문 기능 구현 시 발생 </summary>
 <div markdown="1">
@@ -118,5 +117,5 @@
 </details>
 
 ### ⏱️ 개발 기간
------------------
+---
 2024.04.17~
