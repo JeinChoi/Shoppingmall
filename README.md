@@ -82,7 +82,7 @@
 <div markdown="1">
   
 문제</br>
-- ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/8a6b29b4-afba-4626-bacc-3df7553340f9/c32f5230-7b41-423a-ae0b-70094f69d5a2/Untitled.png)
+- ![에러](https://github.com/JeinChoi/Shoppingmall/assets/59508337/e25f7739-0011-4351-acd9-ebb6c3a4e361)
 - 이메일 인증 링크를 발송할 메일 계정을 설정하고 연결을 시도하던 중에 에러가 발생했다
     
 원인</br>    
