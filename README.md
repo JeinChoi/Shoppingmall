@@ -68,7 +68,7 @@
     ```
 
 원인</br>    
-- JPA는 변경감지로 UPDATE,DELETE 문 생성을 하지만 한번의 변경에 하나의 쿼리만 생성한다. 당시 내가 삭제하려는 튜플이 여러개 였기 때문에 적용이 안됐던 것이었다.
+- JPA는 변경감지로 UPDATE,DELETE 문 생성을 하지만 한번의 변경에 하나의 쿼리만 생성한다. 당시 삭제하려는 튜플이 여러개인 경우가 있었기 때문에 적용이 안됐던 것이었다.
 - @Query 어노테이션은 SELECT문만 지원한다. @Query 어노테이션을 강화하여 INSERT,UPDATE,DELETE 쿼리에도 사용 가능하도록 해야한다. 
 
 해결</br>
@@ -95,18 +95,18 @@
 </details>
 
 <details>
-<summary> 이메일 인증 구현 중 에러 발생  </summary>
+<summary> RedisService bean이 여러개 생성되는 에러 발생 </summary>
 <div markdown="1">
   
 문제</br>
-- ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/8a6b29b4-afba-4626-bacc-3df7553340f9/c32f5230-7b41-423a-ae0b-70094f69d5a2/Untitled.png)
-- 이메일 인증 링크를 발송할 메일 계정을 설정하고 연결을 시도하던 중에 에러가 발생했다
+- bean 연결이 되지 않았다 
     
 원인</br>    
-- 이 프로젝트 jdk 버전이 21인 점을 생각해 애초에 버전 문제이지 않을까 하는 추측을 통해 원인 파악을 하게 됐다.
+- RedisService를 하나의 모듈에서만 쓰는게 아니라서 다른 모듈에도 bean 선언이 필요했고 그래서 여러 bean이 생성되어서 연결이 안됐던 것이다.
 
 해결</br>
-- maven repository에서 spring-boot-starter-mail의 최신 버전을 찾아 수정했더니 해결하게 됐다.
+- @Primary annotation 선언으로 해결 했다. @Primary는 여러 bean이 있을 때 우선순위를 부여하는 어노테이션이다.
+- Spring이 타입으로 bean을 찾다가 @Primary가 붙어있는 bean을 발견하면, 바로 해당 bean을 주입시킨다. 즉, @Primary는 여러 개의 bean들 중에서 우선순위를 부여하는 방법이다.
   
 </div>
 </details>
