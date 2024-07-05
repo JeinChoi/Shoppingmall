@@ -6,28 +6,89 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway Global AuthorizationHeaderFilter
+            preLogger: true
+            postLogger: true
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - 'http://xxxxxxxxxx'
+#              - 'http://localhost:8081'
+#              - 'http://localhost:8082'
+#              - 'http://localhost:8084'
+            allow-credentials: true # 요청 시 인증 정보를 전송하도록 허가
+            allowedHeaders: '*' # 허용하려는 헤더
+            allowedMethods: # 허용하려는 HTTP 메서드
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - OPTIONS
       routes:
         - id: user-service
           uri: http://localhost:8084
           predicates:
             - Path=/user/**
           filters:
+            - RemoveRequestHeader=Cookie
             - RewritePath=/user/(?<segment>.*), /$\{segment}
-        - id: item-service
+            ###################################################
+        - id: product-service
           uri: http://localhost:8082
           predicates:
             - Path=/item/**
           filters:
             - RewritePath=/item/(?<segment>.*), /$\{segment}
+            - RemoveRequestHeader=Cookie
+            - AuthorizationHeaderFilter
+        ###################################################
         - id: order-service
           uri: http://localhost:8081
           predicates:
             - Path=/order/**
           filters:
             - RewritePath=/order/(?<segment>.*), /$\{segment}
+            - RemoveRequestHeader=Cookie
+            - AuthorizationHeaderFilter
 #          metadata:
 #            connect-timeout: 10000
 #            response-timeout: 10000
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #    ?? PC? ????? Database??? ?? ??.
+    url: jdbc:mysql://localhost:3306/shoppingmall?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    #    mysql? ??? ??? ?? ??? ?? ??.
+    #root@172.17.0.1
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+#  jwt:
+#    # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용
+#    secret: testSecretKey20240316testSecretKey20240316testSecretKey20240316
+#    token:
+#      access-expiration-time: 3600000
+#      refresh-expiration-time: 86400000
+#  redis:
+#    host: localhost
+#    port: 6379
+jwt:
+  # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
+  token:
+    access-expiration-time: 3600000
+    refresh-expiration-time: 86400000
 eureka:
   instance:
     prefer-ip-address: true
@@ -42,3 +103,11 @@ management:
     web:
       exposure:
         include: "*"
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          cors:
+            reactive:
+              DefaultCorsProcessor: debug

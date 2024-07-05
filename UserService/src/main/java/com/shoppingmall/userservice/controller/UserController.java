@@ -1,10 +1,8 @@
 package com.shoppingmall.userservice.controller;
 
+import com.shoppingmall.userservice.domain.Member;
 import com.shoppingmall.userservice.domain.User;
-import com.shoppingmall.userservice.dto.ChangeAddressNPhoneDto;
-import com.shoppingmall.userservice.dto.ChangePasswordDto;
-import com.shoppingmall.userservice.dto.FindUserDto;
-import com.shoppingmall.userservice.dto.UserDto;
+import com.shoppingmall.userservice.dto.*;
 import com.shoppingmall.userservice.dto.feignClientDto.UserFeignResponse;
 import com.shoppingmall.userservice.service.UserService;
 import feign.Response;
@@ -26,27 +24,37 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
     private final RedisTemplate<String,String> redisTemplate;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserController.class);
-
+    @PostMapping("/info")
+    void info(){
+        logger.info("--------------userController example--------------");
+    }
 //    @GetMapping("/userInfo")
 //    public ResponseEntity<User> getMyUserInfo() {
 //        return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
 //    }
+    @PostMapping("/login")
+    ResponseEntity<?> login(@RequestBody LoginDto loginDto){
+        return ResponseEntity.ok(userService.login(loginDto));
+    }
+    @PostMapping("/reissue")
+    ResponseEntity<?> reissue(@RequestBody TokenRequestDto tokenRequestDto){
+        return ResponseEntity.ok(userService.reissue(tokenRequestDto));
+    }
     @PostMapping("/signup")
-    ResponseEntity<?> signup(@RequestBody UserDto userDto) throws Exception {
-        return ResponseEntity.ok(userService.signup(userDto));
+    ResponseEntity<?> signup(@RequestBody MemberDto memberDto) throws Exception {
+        return ResponseEntity.ok(userService.signup(memberDto));
     }
     @GetMapping("/verify")
     public String verifyEmail(@RequestParam String email,
                               @RequestParam String token) {
-        Optional<User> user= userService.verifyEmail(email);
-        if(user.get().getEmail_authentication_token().equals(token)){
+        Optional<Member> member= userService.verifyEmail(email);
+        if(member.get().getEmail_authentication_token().equals(token)){
             //권한 바꾸고
-        //    userService.updateAuthority(user.get());
+            userService.updateAuthority(member.get());
 
             logger.info("인증이 완료 {} {}",email,token);
             return "인증완료";
@@ -59,15 +67,15 @@ public class UserController {
     }
     @PostMapping("/bringUser")
     UserFeignResponse findUserByLoginId(@RequestBody FindUserDto findUserDto){
-        Optional<User> findUser = userService.findUser(findUserDto.getLoginId());
+        Member findUser = userService.findUser(findUserDto.getLoginId()).get();
         UserFeignResponse userFeignResponse = new UserFeignResponse(
-                findUser.get().getUserId(),
-                findUser.get().getUsername(),
-                findUser.get().getPhoneNumber(),
-                findUser.get().getEmail(),
-                findUser.get().getCity(),
-                findUser.get().getStreet(),
-                findUser.get().getZipcode());
+                findUser.getMemberId(),
+                findUser.getUsername(),
+                findUser.getPhoneNumber(),
+                findUser.getEmail(),
+                findUser.getCity(),
+                findUser.getStreet(),
+                findUser.getZipcode());
         return userFeignResponse;
     }
     @PostMapping("/logout")

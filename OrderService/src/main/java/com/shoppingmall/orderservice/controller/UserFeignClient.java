@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name="member-service", url="http://localhost:8084")
 public interface UserFeignClient {
-    @PostMapping(path="/user/bringUser")
+    @PostMapping(path="/bringUser")
     UserFeignResponse findUserByLoginId(@RequestBody FindUserDto findUserDto);
 }

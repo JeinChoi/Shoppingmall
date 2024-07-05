@@ -2,7 +2,7 @@ server:
   port: 8084
 spring:
   application:
-    name: product-service
+    name: user-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #    ?? PC? ????? Database??? ?? ??.
@@ -19,14 +19,24 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  redis:
+    host: localhost
+    port: 6379
+
+  email:
+    username: shoppingmall_auth
+    password: SB3@Q!?c-ic3H)Z
 #jwt:
 #  header: Authorization
 #  secret: a2FyaW10b2thcmltdG9rYXJpbXRva2FyaW10b2thcmltdG9rYXJpbXRva2FyaW10b2thcmltdG9rYXJpbXRva2FyaW10b2thcmltdG9rYXJpbXRva2FyaW10b2thcmltdG9rYXJpbXRva2FyaW10b2thcmltdG9rYXJpbXRva2FyaW10b2thcmltdG9rYXJpbQ==
 #  token-validity-in-seconds: 86400000 # ttl (?)
+jwt:
+      # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
+  token:
+    access-expiration-time: 3600000
+    refresh-expiration-time: 86400000
 
-email:
-  username: shoppingmall_auth
-  password: shopping113
 
 eureka:
   instance:

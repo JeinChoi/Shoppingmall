@@ -21,10 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class OrderServiceApplicationTests {
 
-    @Autowired
-     OrderService orderService;
-    @Autowired
-    RedisService redisService;
+//    @Autowired
+//     OrderService orderService;
+//    @Autowired
+//    RedisService redisService;
 //    @Test
 //    void createOrder() throws InterruptedException {
 //        int threadCount = 100;

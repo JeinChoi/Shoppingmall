@@ -80,7 +80,7 @@ public class OrderService {
 //            itemFeignClient.updateState(new ItemUpdateDto(orderItemDto.getItemId()));
 //        }
 
-       // itemFeignClient.updateStock(new UpdateStockDto(orderItem.getItemId(),orderItem.getCount(),false));
+        itemFeignClient.updateStock(new UpdateStockDto(orderItem.getItemId(),orderItem.getCount(),false));
 //        manageRedis(orderItem,userFeignResponse);
 //        orderItemRepository.save(orderItem);
 //        Order order = new Order(
@@ -100,7 +100,7 @@ public class OrderService {
 //
 //        orderRepository.save(order);
         saveOrder(orderItem,userFeignResponse);
-        manageRedis(orderItem);
+     //   manageRedis(orderItem);
         return 1;
         //return order.getOrderId();
     }

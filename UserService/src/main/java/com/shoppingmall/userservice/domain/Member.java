@@ -13,21 +13,21 @@ import java.util.Arrays;
 import java.util.List;
 
 @Entity // DB의 테이블과 1:1 매핑되는 객체
-@Table(name = "users")
+@Table(name = "member")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    private static final Logger logger = LoggerFactory.getLogger(User.class);
+public class Member {
+    private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
     @JsonIgnore
     @Id // primary key
-    @Column(name = "user_id")
+    @Column(name = "member_id")
     // 자동 증가 되는
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long memberId;
 
     @Column(name = "username", length = 50, unique = true)
     private String username;

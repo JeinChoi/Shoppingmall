@@ -8,6 +8,7 @@ import com.shoppingmall.productservice.dto.UpdateStockDto;
 import com.shoppingmall.productservice.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +40,9 @@ public class ItemService {
 
     //만약에 주문 취소 된 경우에는 - . 혹은 주문 완료된 경우에는 +
     public void updateStock(UpdateStockDto updateStockDto){
-    //여기서 분산락 처리 하는 메서드 호출 해주기 근데 db는....
+        Item findItem = itemRepository.findById(updateStockDto.getItemId()).get();
+        findItem.updateStock(updateStockDto.getCount(), updateStockDto.isPlus());
+
         updateInRedis(updateStockDto);
     }
     @RedissonLock(value="#itemId")

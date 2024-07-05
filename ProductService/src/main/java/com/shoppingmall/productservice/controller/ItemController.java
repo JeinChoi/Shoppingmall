@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.cache.annotation.CachePut;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,10 @@ public class ItemController {
     private final ItemService itemService;
     private final RedisService redisService;
     private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
+    @PostMapping("/info")
+    void info(){
+        logger.info("--------------userController example--------------");
+    }
     @GetMapping("/listdata")//db 저장용
     public ResponseEntity<?> getShoppingInfo() {
 
