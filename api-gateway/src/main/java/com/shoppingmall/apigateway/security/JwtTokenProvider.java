@@ -58,7 +58,8 @@ public class JwtTokenProvider {
         try {
             return Jwts.parser().setSigningKey(SECRET).build().parseSignedClaims(token).getBody();
         } catch (ExpiredJwtException e) {
-            log.info("getClaimsFromJwtToken 메서드 예외 발생 ");
+            log.error("getClaimsFromJwtToken 메서드 예외 발생 ");
+
             return e.getClaims();
         }
     }

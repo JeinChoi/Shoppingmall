@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name="member-service", url="http://localhost:8084")
+@FeignClient(name="user-service")
 public interface UserFeignClient {
     @PostMapping(path="/bringUser")
     UserFeignResponse findUserByLoginId(@RequestBody FindUserDto findUserDto);

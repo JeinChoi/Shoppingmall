@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name="order-service", url="http://localhost:8081")
+@FeignClient(name="order-service")
 public interface OrderFeignClient {
     @PostMapping(path="/order/wishlist")
     ResponseEntity<?> orderWishlist(@RequestBody OrderWishListDto orderWishListDto);

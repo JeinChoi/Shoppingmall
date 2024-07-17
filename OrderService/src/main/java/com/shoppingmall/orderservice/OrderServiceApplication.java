@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @EnableFeignClients
-@EnableDiscoveryClient //이 둘의 차이
+@EnableDiscoveryClient
 @SpringBootApplication
 public class OrderServiceApplication {
 

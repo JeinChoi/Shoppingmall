@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name="item-service", url="http://localhost:8082")
+@FeignClient(name="product-service")
 public interface ItemFeignClient {
     @PostMapping(path="/item/bringItem")
     ItemFeignResponse findItemById(@RequestBody FindItemDto findItemDto);

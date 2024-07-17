@@ -21,8 +21,7 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
     @Query("select o from Order o where o.userId= :userId")
     List<Order> findAllByUserId(@Param("userId") long userId);
 
-    //15분으로 숫자 바꾸기
-    @Query("select o from Order o where TIMESTAMPDIFF(minute,o.orderDate,current_timestamp ) > 3 and o.orderStatus = 0")//timeout이 됐다면
+    @Query("select o from Order o where TIMESTAMPDIFF(minute,o.orderDate,current_timestamp ) > 15 and o.orderStatus = 0")//timeout이 됐다면
     List<Order> findAllTimeout();
 
     @Query("select o from Order o where o.orderStatus = :orderStatus and TIMESTAMPDIFF(day,o.modifiedAt,current_timestamp) < 1 ")

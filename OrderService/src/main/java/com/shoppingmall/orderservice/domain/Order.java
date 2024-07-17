@@ -25,11 +25,10 @@ public class Order {
     @GeneratedValue
     @Column(name="order_id")
     private Long orderId;
-@Version
-private Long version;
-//    @ManyToOne
-//    @JoinColumn(name="user_id")
-//    private User order_user;
+
+    @Version
+    private Long version;
+
     private Long userId;
 
    // private long orderItemId;
@@ -84,7 +83,5 @@ private Long version;
         this.orderStatus=REFUND;
     }
     public void updateOrderStatusToRefundCompleted(){this.orderStatus=REFUND_COMPLETED;}
-    public void updateOrderStatusToRefundImpossible(){
-        this.orderStatus=REFUND_IMPOSSIBLE;
-    }
+
 }

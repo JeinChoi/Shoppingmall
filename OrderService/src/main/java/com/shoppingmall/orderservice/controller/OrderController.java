@@ -18,11 +18,14 @@ public class OrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
-
     @PatchMapping("/refund")
     public ResponseEntity<?> refundItem(@RequestBody RefundOrderDto refundOrderDto){
         boolean possible = orderService.refund(refundOrderDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(possible){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
     @PostMapping("/order")//READY
     public ResponseEntity<?> orderItem(@RequestBody OrderItemDto orderItemDto){
@@ -56,9 +59,10 @@ public class OrderController {
             orderService.deleteOne(orderIdDto);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-
     }
+
+    //만약에 환불 신청한 주문 id 상태가 머머라면
+
     @PostMapping("/order/wishlist")
     public ResponseEntity<?> orderWishlist(@RequestBody OrderWishListDto orderWishListDto){
         orderService.orderWishList(orderWishListDto);

@@ -58,7 +58,7 @@ public class WishController {
         return wishItemService.deleteWishItem(wishItemId);
     }
 
-    @PostMapping("/wish/list")
+    @GetMapping("/wish/list")
     public List<WishItemListDto> wishlist(@RequestBody WishListDto wishListDto){
         List<WishItem> list = wishItemService.findWishItemList(wishListDto.getUserId());
 

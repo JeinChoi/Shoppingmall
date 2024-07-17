@@ -50,11 +50,12 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
             // JWT 토큰 판별
             String token = authorizationHeader.replace("Bearer ", "");
-            log.info(" 토큰 {}",token);
-            jwtTokenProvider.validateJwtToken(token);
+
+            if(!jwtTokenProvider.validateJwtToken(token)){
+               return onError(exchange,"권한 없음", HttpStatus.UNAUTHORIZED);
+            }
 
             String subject = jwtTokenProvider.getUserId(token);
-
             if (subject.equals("feign")) return chain.filter(exchange);
 
             if (!jwtTokenProvider.getRoles(token).contains("USER")) {

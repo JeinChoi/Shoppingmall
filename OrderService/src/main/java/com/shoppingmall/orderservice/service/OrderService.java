@@ -197,16 +197,16 @@ public boolean refund(RefundOrderDto refundOrderDto){
         Timestamp returnDate;
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.DATE,1);
+        cal.add(Calendar.DATE,1);//배송 완료된 날에서 하루를 더한다
         returnDate= new Timestamp(cal.getTime().getTime());
-        logger.info("환불 날짜 {}",returnDate);
-        if(findOrder.getDeliveryStatus().equals(COMPLETED)
-                && findOrder.getModifiedAt().before(returnDate)){//&&완료 이후 날짜가 하루 미만 이어야 함..)
-            findOrder.updateOrderStatusToRefund();
+        logger.info("환불 가능 날짜 {}",returnDate);
+
+        if(findOrder.getDeliveryStatus().equals(COMPLETED)//배송 상태가 completed 되어 있고
+                && findOrder.getModifiedAt().before(returnDate)){//completed되고 나서 하루 미만 이어야 함
+            findOrder.updateOrderStatusToRefund();//refund로 상태 변경
             return true;
         }
         else{//환불 가능 날짜 이후라면 false 반환
-            //findOrder.updateOrderStatusToRefundImpossible();
             return false;
         }
 
@@ -278,7 +278,7 @@ public boolean refund(RefundOrderDto refundOrderDto){
         }
     }
 
-    @Scheduled(cron="0 39 15 * * *")//order 중에 refund 상태이면서 modified 날짜가 하루가 차이나는 것만 가져오기
+    @Scheduled(cron="0 39 15 * * *")//order 중에 refund 상태이면서 modified 날짜가 하루 이하로 차이나는 것만 가져오기
     public void updateRefundCompletedStock(){
         List<Order> orderList = orderRepository.findAllRefund(OrderStatus.REFUND);
 
@@ -287,7 +287,6 @@ public boolean refund(RefundOrderDto refundOrderDto){
                     order.getOrderItem().getCount(),true));
             order.updateOrderStatusToRefundCompleted();
         }
-
     }
     @Scheduled(cron="0 0/5 * * * ?")
     public void checkOrderStatus(){//order의 orderstatus가 여전히 0이라면 삭제 및 재고 + 처리

@@ -57,6 +57,8 @@ public class ItemController {
         return Integer.parseInt(redisService.getValues(itemId));
     }
 
+
+
     @PostMapping("/updateState")
     public void updateState(@RequestBody ItemUpdateDto itemUpdateDto){
         itemService.updateState(itemUpdateDto.getItemId());

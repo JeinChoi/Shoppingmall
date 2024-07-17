@@ -58,7 +58,8 @@ public class UserService {
                 + "<h1> 안녕하세요. Shoppingmall 입니다</h1>"
                 + "<br>"
                 + "<p>아래 링크를 클릭하면 이메일 인증이 완료됩니다.<p>"
-                + "<a href='http://localhost:9001/user/verify?email="+receiverMail+"&token=" + memberDto.getEmail_authentication_token() + "'>인증 링크</a>"
+                + "<a href='http://localhost:9001/user/verify?email="+receiverMail+"&token=" +
+                memberDto.getEmail_authentication_token() + "'>인증 링크</a>"
                 + "</div>";
 
         message.setText(body, "utf-8", "html");// 내용, charset 타입, subtype
@@ -70,7 +71,7 @@ public class UserService {
         // 가입되어 있지 않은 회원이면,
         // 권한 정보 만들고
         Authority authority = Authority.builder()
-                .authorityName("ROLE_USER") //나중에 guest로 변경 하든지 권한 없애든지 하기
+                .authorityName("ROLE_USER")
                 .build();
 
         // 유저 정보를 만들어서 save
@@ -98,12 +99,14 @@ public class UserService {
     public TokenDto login(LoginDto loginDto){
 
         UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
+        //요청을 통해 넘어온 email과 password 기반으로 UsernamePasswordAuthenticationToken을 반환한다.
         log.info("------------login 메서드로 다시 돌아왔는지");
 
         //loadUserByUsername 메서드 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         log.info("인증 됐는지 {}",authentication.isAuthenticated());
+
         TokenDto tokenDto = jwtTokenProvider.createJwtAccessToken(authentication);
 
         RefreshToken refreshToken = RefreshToken.builder()
