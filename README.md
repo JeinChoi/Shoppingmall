@@ -1,6 +1,8 @@
 
 ### 📢 프로젝트 소개
 
+---
+
 
 - 고객이 상품을 구매하고, 구매함에 따라 재고 관리, 배송 관리를 해주는 서비스입니다.
 
@@ -8,7 +10,9 @@
 
 </br>
 
-### 📢 개발 환경
+### 🏞 개발 환경
+
+---
 
 ![java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![spring boot](https://img.shields.io/badge/-Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
@@ -16,8 +20,6 @@
 ![spring security](https://img.shields.io/badge/-Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
 ![My SQL](https://img.shields.io/badge/-My%20SQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis](https://img.shields.io/badge/-redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-
-</br>
 
 - Version: Java 21
 
@@ -28,7 +30,7 @@
 - ORM: JPA/Hibernate
 </br>
 
-### 📢 주요 기능
+### ⭐ 주요 기능
 ---
 
 - API Gateway를 통해 MSA로 구현. 서비스 기능별로 분리
@@ -50,7 +52,8 @@
   - 환불 후 1일: 환불한 상품의 재고 반영
   </br>  
 
-### 📢 ERD
+
+### 🖋 ERD
 ---
 ![ERD](https://github.com/JeinChoi/Shoppingmall/assets/59508337/b424afbb-e6ee-4f59-a1ba-9221f38cf5c3)
 
@@ -59,6 +62,7 @@
 ### 🏠 아키텍처
 ---
 ![아키텍처](https://github.com/user-attachments/assets/5811530a-6029-4e51-848f-620a6c44a573)
+
 
 </br>
 
