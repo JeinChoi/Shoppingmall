@@ -27,10 +27,10 @@ public class PrincipalDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return memberRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return memberRepository.findByEmail(username)
                 .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException(email + " -> 데이터베이스에서 찾을 수 없습니다."));
+                .orElseThrow(() -> new UsernameNotFoundException(username + " -> 데이터베이스에서 찾을 수 없습니다."));
 
     }
 
@@ -39,7 +39,7 @@ public class PrincipalDetailsService implements UserDetailsService {
         GrantedAuthority grandAuthority = new SimpleGrantedAuthority(member.getRole());
         log.info("createUserDetails 함수가 실행이 됐는지");
         return new User(
-                String.valueOf(member.getMemberId()),
+                String.valueOf(member.getMemberId()), // memberId로 "name"을 지정
                 member.getPassword(),
                 Collections.singleton(grandAuthority)
         );

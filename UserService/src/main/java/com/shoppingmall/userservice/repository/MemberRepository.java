@@ -13,6 +13,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m FROM Member m where m.email=:email")
     Optional<Member> findByEmail(@Param("email") String email);
 
+    Optional<Member> findByMemberId(Long userId);
 //    public long updateAddressNPhone(ChangeAddressNPhoneDto changeAddressNPhoneDto, long userId){
 //        return em.createQuery("update User as u set u.city = :city, u.street = :street, u.zipcode = :zipcode ," +
 //                        "u.phoneNumber = :phoneNumber where u.userId= :userId")

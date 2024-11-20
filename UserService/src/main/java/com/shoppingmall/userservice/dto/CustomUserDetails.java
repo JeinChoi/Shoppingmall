@@ -1,7 +1,8 @@
 package com.shoppingmall.userservice.dto;
 
 
-import com.shoppingmall.userservice.domain.User;
+
+import com.shoppingmall.userservice.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final User userEntity;
+    private final Member userEntity;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

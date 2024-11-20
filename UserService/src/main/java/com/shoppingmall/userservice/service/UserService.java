@@ -89,36 +89,38 @@ public class UserService {
                 .build();
 
         return memberRepository.save(member);
+
+
     }
     @Transactional
     public Optional<Member> verifyEmail(String email){
         return memberRepository.findByEmail(email);
     }
 
-    @Transactional
-    public TokenDto login(LoginDto loginDto){
-
-        UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
-        //요청을 통해 넘어온 email과 password 기반으로 UsernamePasswordAuthenticationToken을 반환한다.
-        log.info("------------login 메서드로 다시 돌아왔는지");
-
-        //loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        log.info("인증 됐는지 {}",authentication.isAuthenticated());
-
-        TokenDto tokenDto = jwtTokenProvider.createJwtAccessToken(authentication);
-
-        RefreshToken refreshToken = RefreshToken.builder()
-                .key(authentication.getName())
-                .value(tokenDto.getRefreshToken())
-                .build();
-
-        refreshTokenRepository.save(refreshToken);//refreshtoken 저장.
-
-        return tokenDto;
-
-    }
+//    @Transactional
+//    public TokenDto login(LoginDto loginDto){
+//
+//        UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
+//        //요청을 통해 넘어온 email과 password 기반으로 UsernamePasswordAuthenticationToken을 반환한다.
+//        log.info("------------login 메서드로 다시 돌아왔는지");
+//
+//        //loadUserByUsername 메서드 실행
+//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+//
+//        log.info("인증 됐는지 {}",authentication.isAuthenticated());
+//
+//        TokenDto tokenDto = jwtTokenProvider.createJwtAccessToken(authentication);
+//
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .key(authentication.getName())
+//                .value(tokenDto.getRefreshToken())
+//                .build();
+//
+//        refreshTokenRepository.save(refreshToken);//refreshtoken 저장.
+//
+//        return tokenDto;
+//
+//    }
 
     @Transactional
     public TokenDto reissue(TokenRequestDto tokenRequestDto){
@@ -154,8 +156,8 @@ public class UserService {
 //    }
 
     @Transactional(readOnly = true)
-    public Optional<Member> getUserDetailsByEmail(String email) {
-        return memberRepository.findByEmail(email);
+    public Optional<Member> getUserDetailsByMemberId(Long memberId) {
+        return memberRepository.findByMemberId(memberId);
     }
     @Transactional
     public Optional<Member> findUser(long userId){
@@ -172,19 +174,13 @@ public class UserService {
     @Transactional
     public Optional<Member> changeAddressNPhoneNumber(ChangeAddressNPhoneDto changeAddressNPhoneDto){
         Optional<Member> temp = memberRepository.findById(changeAddressNPhoneDto.getUserId());
-        //        Optional<User> temp = SecurityUtil.getCurrentUsername()
-//                .flatMap(userRepository::findOneWithAuthoritiesByUsername);
-        if(temp.isPresent()){
-            temp.get().updateAddressNPhone(changeAddressNPhoneDto);
-        }
+        temp.ifPresent(member -> member.updateAddressNPhone(changeAddressNPhoneDto));
         return temp;
     }
 
     @Transactional
     public  Optional<Member> changePassword(ChangePasswordDto changePasswordDto){
         Optional<Member> temp = memberRepository.findById(changePasswordDto.getUserId());
-       // Optional<User> temp = SecurityUtil.getCurrentUsername()
-       //         .flatMap(userRepository::findOneWithAuthoritiesByUsername);
         temp.ifPresent(member -> member.updatePassword(changePasswordDto.getPassword()));
 
         return temp;

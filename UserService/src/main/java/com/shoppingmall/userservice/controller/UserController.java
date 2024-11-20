@@ -1,7 +1,7 @@
 package com.shoppingmall.userservice.controller;
 
 import com.shoppingmall.userservice.domain.Member;
-import com.shoppingmall.userservice.domain.User;
+
 import com.shoppingmall.userservice.dto.*;
 import com.shoppingmall.userservice.dto.feignClientDto.UserFeignResponse;
 import com.shoppingmall.userservice.service.UserService;
@@ -36,10 +36,10 @@ public class UserController {
 //    public ResponseEntity<User> getMyUserInfo() {
 //        return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
 //    }
-    @PostMapping("/login")
-    ResponseEntity<?> login(@RequestBody LoginDto loginDto){
-        return ResponseEntity.ok(userService.login(loginDto));
-    }
+//    @PostMapping("/login")
+//    ResponseEntity<?> login(@RequestBody LoginDto loginDto){
+//        return ResponseEntity.ok(userService.login(loginDto));
+//    }
     @PostMapping("/reissue")
     ResponseEntity<?> reissue(@RequestBody TokenRequestDto tokenRequestDto){
         return ResponseEntity.ok(userService.reissue(tokenRequestDto));
