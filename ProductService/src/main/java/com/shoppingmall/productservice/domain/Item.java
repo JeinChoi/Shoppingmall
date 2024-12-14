@@ -24,7 +24,7 @@ public class Item {
     @Id // primary key
     @Column(name = "item_id")
     // 자동 증가 되는
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long itemId;
 
     @Column(name="item_name")
@@ -44,6 +44,7 @@ public class Item {
     @JsonIgnore
     @Column(name = "detail")
     private String detail;
+
 
     private ItemState itemState;
 

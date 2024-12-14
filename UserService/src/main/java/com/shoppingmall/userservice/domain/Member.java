@@ -26,7 +26,7 @@ public class Member {
     @Id // primary key
     @Column(name = "member_id")
     // 자동 증가 되는
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long memberId;
 
     @Column(name = "username", length = 50, unique = true)

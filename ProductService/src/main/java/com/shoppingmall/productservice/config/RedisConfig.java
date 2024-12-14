@@ -1,6 +1,7 @@
 package com.shoppingmall.productservice.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +21,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 @EnableRedisRepositories
 @EnableCaching
+@Slf4j
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
@@ -32,16 +34,13 @@ public class RedisConfig {
 
     // Redis template
 
-    @Primary
-    public RedisTemplate<String,String> redisTemplate() {
-        RedisTemplate<String, String> storageTemplate = new RedisTemplate<>();
+    @Bean
+    public RedisTemplate<?, ?> redisTemplate() {
+        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());   //connection
 
-        storageTemplate.setConnectionFactory(redisConnectionFactory());   //connection
-        storageTemplate.setKeySerializer(new StringRedisSerializer());    // key
-        storageTemplate.setValueSerializer(new StringRedisSerializer());  // value
-        ValueOperations<String, String> valueOperations = storageTemplate.opsForValue();
-       // valueOperations.set("first","logout");
-        return storageTemplate;
+
+        return redisTemplate;
     }
 }
 

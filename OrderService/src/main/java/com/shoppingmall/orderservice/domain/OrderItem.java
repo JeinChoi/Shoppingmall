@@ -23,13 +23,9 @@ import java.sql.Timestamp;
 public class OrderItem {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_item_id")
     private long orderItemId;
-    @Version
-    private Long version;
-
-    private int price;
 
     private int count;
 
@@ -50,11 +46,10 @@ public class OrderItem {
 //    private Item orderItem_item;
 
 
-    public static OrderItem createOrderItem(long itemId,int price, int count) {
+    public static OrderItem createOrderItem(long itemId, int count) {
         OrderItem orderItem = new OrderItem();
 
         orderItem.setItemId(itemId);
-        orderItem.setPrice(price);
         orderItem.setCount(count);
 
         //item.removeStock(count); //재고수 지우는 작업을 따로 해야한다.

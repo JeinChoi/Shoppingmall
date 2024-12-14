@@ -18,6 +18,11 @@ ext {
 repositories {
     mavenCentral()
 }
+test {
+    // 테스트 실행 시 'test' 프로파일을 활성화
+    systemProperty 'spring.profiles.active', 'test'
+
+}
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -34,7 +39,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
+    testRuntimeOnly 'com.h2database:h2'
     implementation 'org.json:json:20231013'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -46,7 +51,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 //    implementation 'org.springframework.boot:spring-boot-starter-session-data-redis'
 
-    implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 dependencyManagement {

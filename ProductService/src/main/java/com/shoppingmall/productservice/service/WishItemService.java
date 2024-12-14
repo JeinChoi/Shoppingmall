@@ -54,7 +54,7 @@ public void update(ChangeWishItemDto changeWishItemDto){
 
         List<WishItem> list = wishItemRepository.findAllByUserId(userId);
         List<OrderItemDto> orderItemList = new ArrayList<>();
-//여기서 dto로 list 만들고 itemId, count,price
+        //여기서 dto로 list 만들고 itemId, count,price
         //list랑 userid 같이 보내기
 
         for(WishItem one : list){

@@ -1,6 +1,5 @@
 package com.shoppingmall.orderservice.service;
 
-import com.shoppingmall.orderservice.config.RedissonLock;
 import com.shoppingmall.orderservice.controller.ItemFeignClient;
 import com.shoppingmall.orderservice.controller.UserFeignClient;
 import com.shoppingmall.orderservice.domain.DeliveryStatus;
@@ -14,13 +13,14 @@ import com.shoppingmall.orderservice.dto.feignClientDto.ItemFeignResponse;
 import com.shoppingmall.orderservice.dto.feignClientDto.UserFeignResponse;
 
 import com.shoppingmall.orderservice.dto.feignClientDto.WishItemListDto;
-import com.shoppingmall.orderservice.repository.OrderItemRepository;
-import com.shoppingmall.orderservice.repository.OrderRepository;
+import com.shoppingmall.orderservice.repository.*;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.shoppingmall.orderservice.domain.DeliveryStatus.*;
 
@@ -42,143 +43,205 @@ import static com.shoppingmall.orderservice.domain.DeliveryStatus.*;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderBulkRepository orderBulkRepository;
+
+    private final OrderSaveService orderSaveService;
+
     private final OrderItemRepository orderItemRepository;
+    private final OrderItemBulkRepository orderItemBulkRepository;
 
     private final RedisService redisService;
     private final ItemFeignClient itemFeignClient;
     private final UserFeignClient userFeignClient;
 
-    private final RedissonClient redissonClient;
+    private final RedissonClient redisson;
+
+    private final List<Order> orders = new ArrayList<>();
+    private final AtomicInteger counter = new AtomicInteger(0);
+
+    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
+    private int batchSize;
+
+    private final List<OrderItem> orderItems = new LinkedList<>();
+    private final int orderItemsBatchSize=100;
+
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-    public void save(Order order) {
-        orderRepository.save(order);
-    }
+    private final EntityManager em;
 
 
-    public void save(OrderItem orderItem){
-        orderItemRepository.save(orderItem);
-    }
-
-
-    public long order(OrderItemDto orderItemDto){
-        ItemFeignResponse itemFeignResponse = itemFeignClient.findItemById(new FindItemDto(orderItemDto.getItemId()));
-        UserFeignResponse userFeignResponse = userFeignClient.findUserByLoginId(new FindUserDto(orderItemDto.getUserId()));
-        //주문상품 생성
-        OrderItem orderItem = OrderItem.createOrderItem(orderItemDto.getItemId(), itemFeignResponse.getPrice(), orderItemDto.getCount());
-
-        int presentStock = Integer.parseInt(redisService.getValues(orderItemDto.getItemId()+""));
-        //presentstock가 0인 경우도 분기처리 필요
-
-        if(presentStock<orderItemDto.getCount())
-            throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다");
-        else if(presentStock==0)
-            throw new IllegalArgumentException("재고 수량이 0입니다");
-
-//        int updateStock = presentStock-orderItemDto.getCount();
-//        if(updateStock==0) {
-//            itemFeignClient.updateState(new ItemUpdateDto(orderItemDto.getItemId()));
-//        }
-
-        itemFeignClient.updateStock(new UpdateStockDto(orderItem.getItemId(),orderItem.getCount(),false));
-//        manageRedis(orderItem,userFeignResponse);
-//        orderItemRepository.save(orderItem);
-//        Order order = new Order(
-//                orderItemDto.getUserId(), READY, OrderStatus.READY,
-//                orderItem,userFeignResponse.getCity(),
-//                userFeignResponse.getStreet(),userFeignResponse.getZipcode());
+//    public void order(OrderItemDto orderItemDto){
+//        ItemFeignResponse itemFeignResponse = itemFeignClient.findItemById(new FindItemDto(orderItemDto.getItemId()));
+//        UserFeignResponse userFeignResponse = userFeignClient.findUserByLoginId(new FindUserDto(orderItemDto.getUserId()));
+//        //주문상품 생성
+//        OrderItem orderItem = OrderItem.createOrderItem(
+//                orderItemDto.getItemId(),
+//                itemFeignResponse.getPrice(),
+//                orderItemDto.getCount());
 //
-//        orderRepository.save(order);
-       // redisService.setValues(orderItemDto.getItemId()+"",updateStock+"");
-        //이부분 product feign client로 바꾸기 캐싱 처리하는 부분. 여기서 안할거임
-//        manageRedis(orderItem,userFeignResponse);
-//        orderItemRepository.save(orderItem);
-//        Order order = new Order(
+//        //주문 생성
+//        Order order = Order.createOrder(
 //                userFeignResponse.getUserId(), READY, OrderStatus.READY,
 //                orderItem,userFeignResponse.getCity(),
 //                userFeignResponse.getStreet(),userFeignResponse.getZipcode());
 //
-//        orderRepository.save(order);
-        saveOrder(orderItem,userFeignResponse);
-     //   manageRedis(orderItem);
-        return 1;
-        //return order.getOrderId();
-    }
-    public void redisTest(){
+//        RLock lock = redisson.getLock("order:"+ orderItemDto.getItemId());
+//        boolean isLocked=false;
+//        try{
+//            isLocked=lock.tryLock(500,300,TimeUnit.MILLISECONDS);
+//            if(isLocked){
+//                Long presentStock =redisService.getValues(orderItemDto.getItemId());
+//                //presentstock가 0인 경우도 분기처리 필요
+//
+//               // itemFeignClient.updateStock(new UpdateStockDto(orderItem.getItemId(),orderItem.getCount(),false));
+//                if(presentStock<orderItemDto.getCount())
+//                    throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다");
+//                else if(presentStock==0)
+//                    throw new IllegalArgumentException("재고 수량이 0입니다");
+//                long updateStock = presentStock-orderItemDto.getCount();
+//                if(updateStock==0) {
+//                    //updateState(orderItemDto.getItemId());
+//                }
+//                redisService.setValues(orderItemDto.getItemId(),updateStock);
+//            }else {
+//                throw new IllegalStateException("락 획득 실패");
+//            }
+//        } catch(Exception e){
+//            handleOrderFailure(order,orderItem, e);//Redis와 MySQL 모두 롤백
+//        }finally{
+//            if(lock!=null && lock.isHeldByCurrentThread()){
+//                lock.unlock();
+//            }
+//        }
+//        //saveOrder(orderItem,userFeignResponse);
+//       addOrder(orderItem,order,userFeignResponse);
+//
+//      // orderRepository.save(order);
+//    }
+public void order(OrderItemDto orderItemDto){//itemid,userid,count
+    //주문상품 생성
+    OrderItem orderItem = OrderItem.createOrderItem(
+            orderItemDto.getItemId(),
+            orderItemDto.getCount());
 
-        int presentStock = Integer.parseInt(redisService.getValues(126+""));
-        //presentstock가 0인 경우도 분기처리 필요
+    //주문 생성
+    Order order = Order.createOrder(orderItemDto.getUserId(),
+            DeliveryStatus.READY, OrderStatus.READY, orderItem);
 
-        if(presentStock<1)
-            throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다");
+    RLock lock = redisson.getLock("order:"+ orderItemDto.getItemId());
+    boolean isLocked=false;
+    try{
+        isLocked=lock.tryLock(50,30,TimeUnit.SECONDS);
+        if(isLocked){
+            Long presentStock = Long.parseLong(redisService.getValues(orderItemDto.getItemId()+""));
+             if(presentStock<orderItemDto.getCount())
+                throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다");
+            else if(presentStock==0)
+                throw new IllegalArgumentException("재고 수량이 0입니다");
+            long updateStock = presentStock-orderItemDto.getCount();
+            if(updateStock==0) {
+                itemFeignClient.updateState(new ItemUpdateDto(orderItemDto.getItemId()));
 
-        int updateStock = presentStock-1;
-//        if(updateStock==0)
-//            itemFeignClient.updateState(new ItemUpdateDto(126));
-        String lockName = "ITEM" + 126;
-        RLock rLock = redissonClient.getLock(lockName);
-
-        long waitTime = 5L;
-        long leaseTime = 3L;
-        TimeUnit timeUnit = TimeUnit.SECONDS;
-        try {
-            boolean available = rLock.tryLock(waitTime, leaseTime, timeUnit);
-            if(!available){
-                logger.info("lock 획득 실패={}",lockName);
-                throw new RuntimeException();
             }
-            redisService.setValues(126+"",updateStock+""); //만약 여기서 false가 반환되면 item 상태는 품절로 바뀌고 주문 실패 띄우기
-            //애초에 품절 상태면 상세보기에서 구매도 안되도록 처리해야한다
-            //만약 주문 수량이 재고량 보다 많으면
-
-        }catch (InterruptedException e){
-            //락을 얻으려고 시도하다가 인터럽트를 받았을 때 발생하는 예외
-            logger.info("lock 얻으려고 시도하다가 실패 ");
-            throw new RuntimeException();
-        }finally{
-            try{
-                rLock.unlock();
-                logger.info("unlock complete: {}", rLock.getName());
-            }catch (IllegalMonitorStateException e){
-                //이미 종료된 락일 때 발생하는 예외
-                throw new RuntimeException();
-            }
+            redisService.setValues(orderItemDto.getItemId()+"",updateStock+"");
+        }else {
+            throw new IllegalStateException("락 획득 실패");
         }
-       // redisService.setValues(126+"",updateStock+"");
+    } catch(Exception e){
+        em.clear();
+        logger.info(e.toString());
+    }finally{
+        lock.unlock();
     }
+    orderSaveService.saveOrdersNOrderItem(order,orderItem);
+}
 
-    public void saveOrder(OrderItem orderItem, UserFeignResponse userFeignResponse){
-        orderItemRepository.save(orderItem);
-        Order order = new Order(
-                userFeignResponse.getUserId(), READY, OrderStatus.READY,
-                orderItem,userFeignResponse.getCity(),
-                userFeignResponse.getStreet(),userFeignResponse.getZipcode());
 
-        orderRepository.save(order);
-    }
-    @RedissonLock(value="#itemId")
-    public void manageRedis(OrderItem orderItem){
+    public void orderBulk(OrderItemDto orderItemDto){//itemid,userid,count
+        ItemFeignResponse itemFeignResponse = itemFeignClient.findItemById(new FindItemDto(orderItemDto.getItemId()));
+        UserFeignResponse userFeignResponse = userFeignClient.findUserByLoginId(new FindUserDto(orderItemDto.getUserId()));
+        //주문상품 생성
 
-        int presentStock = Integer.parseInt(redisService.getValues(orderItem.getItemId()+""));
-        int updateStock = presentStock-orderItem.getCount();
-        //presentstock가 0인 경우도 분기처리 필요
-        logger.info("현재 재고 량 :::: {}",presentStock);
+        OrderDto orderDto = OrderDto.builder().
+                userId(orderItemDto.getUserId()).
+                orderStatus(OrderStatus.READY).
+                deliveryStatus(DeliveryStatus.READY).
+                city(userFeignResponse.getCity()).
+                street(userFeignResponse.getStreet()).
+                zipcode(userFeignResponse.getZipcode()).build();
+
+        OrderItemBulkDto orderItemBulkDto = OrderItemBulkDto.builder().
+                userId(orderItemDto.getUserId()).
+                itemId(orderItemDto.getItemId()).
+                count(orderItemDto.getCount()).
+                price(itemFeignResponse.getPrice()).
+                build();
+
+        RLock lock = redisson.getLock("order:"+ orderItemDto.getItemId());
+        boolean isLocked=false;
         try{
-            if(presentStock<1)
-                throw new RuntimeException("주문 수량이 재고 수량보다 많습니다");
-            else if(updateStock<1)
-                throw new RuntimeException("주문 수량이 재고 수량보다 많습니다");
-        }catch(Exception e){
-            System.err.println("오류: "+e.getMessage());
-        }
+            isLocked=lock.tryLock(10,30,TimeUnit.SECONDS);
+            if(isLocked){
+                Long presentStock = Long.parseLong(redisService.getValues(orderItemDto.getItemId()+""));
+                //presentstock가 0인 경우도 분기처리 필요
 
-            redisService.setValues(orderItem.getItemId()+"",updateStock+""); //만약 여기서 false가 반환되면 item 상태는 품절로 바뀌고 주문 실패 띄우기
-            //애초에 품절 상태면 상세보기에서 구매도 안되도록 처리해야한다
-            //만약 주문 수량이 재고량 보다 많으면
-       // itemFeignClient.updateStock(new UpdateStockDto(126,1,false));
-        // redisService.setValues(126+"",updateStock+"");
+                // itemFeignClient.updateStock(new UpdateStockDto(orderItem.getItemId(),orderItem.getCount(),false));
+                if(presentStock<orderItemDto.getCount())
+                    throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다");
+                else if(presentStock==0)
+                    throw new IllegalArgumentException("재고 수량이 0입니다");
+                long updateStock = presentStock-orderItemDto.getCount();
+                if(updateStock==0) {
+                    //updateState(orderItemDto.getItemId());
+                }
+                redisService.setValues(orderItemDto.getItemId()+"",updateStock+"");
+                logger.info("redis value 재고량 ::::: ",updateStock);
+            }else {
+                throw new IllegalStateException("락 획득 실패");
+            }
+        } catch(Exception e){
+        //   handleOrderFailure(order,orderItem, e);//Redis와 MySQL 모두 롤백
+        }finally{
+            lock.unlock();
+        }
+         addOrderDto(orderDto,orderItemBulkDto,userFeignResponse);
+    }
+
+
+
+    private static List<OrderDto> orderDtos = new LinkedList<>();
+    private static List<OrderItemBulkDto> orderItemBulkDtos = new LinkedList<>();
+    public void addOrderDto(OrderDto orderDto, OrderItemBulkDto orderItemBulkDto, UserFeignResponse userFeignResponse){
+
+        boolean saveOrders = orders.size()%batchSize==0;
+        boolean saveOrderItems = orderItems.size()%batchSize==0;
+        //order.setOrderItem(orderItem);
+        orderDtos.add(orderDto);
+        orderItemBulkDtos.add(orderItemBulkDto);
+
+        if(orders.size()>=batchSize){
+
+           orderItemBulkRepository.saveAll(orderDtos,orderItemBulkDtos);
+            // orderItemRepository.saveAll(orderItems);
+
+            orderDtos.clear();
+            orderItemBulkDtos.clear();
+        }
+    }
+    void handleOrderFailure(Order order, OrderItem orderItem,Exception e){
+        logger.info("롤백 처리 됐는지", e);
 
     }
+
+
+    @Scheduled(fixedDelay = 60000) // 1분마다 실행
+    @Transactional
+    public void scheduledSave() {
+        orderRepository.saveAll(orders);
+        orders.clear();
+    }
+
+
     public void updateOrderStatus(OrderIdDto orderIdDto){
         Order findOrder = orderRepository.findById(orderIdDto.getOrderId()).get();
         findOrder.updateOrderStatus();
@@ -218,14 +281,13 @@ public boolean refund(RefundOrderDto refundOrderDto){
         List<OrderItem> orderItemList = new ArrayList<>();
         for(WishItemListDto one : wishList){
 
-            OrderItem orderItem = OrderItem.createOrderItem(one.getItemId(),one.getPrice(),one.getCount());
+            OrderItem orderItem = OrderItem.createOrderItem(one.getItemId(),one.getCount());
             orderItemList.add(orderItem);
 
             orderList.add(new Order(
                     orderWishListDto.getUserId(),
                     READY,OrderStatus.START,
-                    orderItem,userFeignResponse.getCity(),
-                    userFeignResponse.getStreet(),userFeignResponse.getZipcode()));
+                    orderItem));
 
         }
         orderItemRepository.saveAll(orderItemList);
@@ -238,26 +300,22 @@ public boolean refund(RefundOrderDto refundOrderDto){
         List<OrderListDto> orderListdto = new ArrayList<>();
         List<Order> orderlist = orderRepository.findAllByUserId(userId);
 
-        for(Order one : orderlist){
-            ItemFeignResponse itemFeignResponse = itemFeignClient.findItemById(new FindItemDto(one.getOrderItem().getItemId()));
-
-            orderListdto.add(new OrderListDto(
-                    one.getOrderId(),
-                    one.getOrderItem().getOrderItemId(),
-                    //itemId
-                    itemFeignResponse.getItemId(),
-                    one.getDeliveryStatus(),
-                    one.getCity(),
-                    one.getStreet(),
-                    one.getZipcode(),
-                    one.getOrderDate(),
-                    one.getOrderItem().getCount(),
-                    one.getOrderItem().getPrice(),
-                    one.getOrderItem().getCount()*one.getOrderItem().getPrice(),
-                    //itemName
-                    itemFeignResponse.getItemName()
-            ));
-        }
+//        for(Order one : orderlist){
+//            ItemFeignResponse itemFeignResponse = itemFeignClient.findItemById(new FindItemDto(one.getOrderItem().getItemId()));
+//
+//            orderListdto.add(new OrderListDto(
+//                    one.getOrderId(),
+//                    one.getOrderItem().getOrderItemId(),
+//                    //itemId
+//                    itemFeignResponse.getItemId(),
+//                    one.getDeliveryStatus(),
+//                    one.getOrderDate(),
+//                    one.getOrderItem().getPrice(),
+//                    one.getOrderItem().getCount()*one.getOrderItem().getPrice(),
+//                    //itemName
+//                    itemFeignResponse.getItemName()
+//            ));
+//        }
         return orderListdto;
     }
 
@@ -281,10 +339,13 @@ public boolean refund(RefundOrderDto refundOrderDto){
     @Scheduled(cron="0 39 15 * * *")//order 중에 refund 상태이면서 modified 날짜가 하루 이하로 차이나는 것만 가져오기
     public void updateRefundCompletedStock(){
         List<Order> orderList = orderRepository.findAllRefund(OrderStatus.REFUND);
+        if(orderList.isEmpty())
+            return;
 
         for(Order order : orderList){
-            itemFeignClient.updateStock(new UpdateStockDto(order.getOrderItem().getItemId(),
-                    order.getOrderItem().getCount(),true));
+            OrderItem orderItem = order.getOrderItem();
+            itemFeignClient.updateStock(new UpdateStockDto(orderItem.getItemId(),
+                    orderItem.getCount(),true));
             order.updateOrderStatusToRefundCompleted();
         }
     }
@@ -293,6 +354,9 @@ public boolean refund(RefundOrderDto refundOrderDto){
         List<Order> orderList = orderRepository.findAllTimeout();
         List<OrderItem> orderItemList = new ArrayList<>();
         //where 조건절에 시간을 비교하는 sql문을 생성
+        if(orderList.isEmpty())
+            return;
+
         for(Order order : orderList){
             itemFeignClient.updateStock(new UpdateStockDto(order.getOrderItem().getItemId(),order.getOrderItem().getCount(),true));
             orderItemList.add(order.getOrderItem());

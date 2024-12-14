@@ -9,13 +9,16 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
-   // @Lock(LockModeType.PESSIMISTIC_WRITE)
-    //@QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "15000")})
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Order save(Order order);
 
     @Query("select o from Order o where o.userId= :userId")

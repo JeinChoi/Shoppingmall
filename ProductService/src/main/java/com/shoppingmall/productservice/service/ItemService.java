@@ -12,7 +12,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -27,7 +29,9 @@ public class ItemService {
        return itemRepository.findById(itemId);
     }
 
-
+    public  void saveAll(List<Item> items){
+        itemRepository.saveAll(items);
+    }
     public void updateState(Long itemId){
         Item findItem = itemRepository.findById(itemId).get();
         findItem.updateStateToSoldout();
@@ -40,15 +44,17 @@ public class ItemService {
 
     //만약에 주문 취소 된 경우에는 - . 혹은 주문 완료된 경우에는 +
     public void updateStock(UpdateStockDto updateStockDto){
-        Item findItem = itemRepository.findById(updateStockDto.getItemId()).get();
+
+
+        Item findItem = itemRepository.findById(updateStockDto.getItemId()).orElse(null);
+
         findItem.updateStock(updateStockDto.getCount(), updateStockDto.isPlus());
 
         updateInRedis(updateStockDto);
     }
-    @RedissonLock(value="#itemId")
     private void updateInRedis(UpdateStockDto updateStockDto){
 
-        int presentStock = Integer.parseInt(redisService.getValues(updateStockDto.getItemId()+""));
+        long presentStock = Long.parseLong(redisService.getValues(updateStockDto.getItemId()+""));
 
         logger.info("현재 재고 량 :: {}",presentStock);
         try{

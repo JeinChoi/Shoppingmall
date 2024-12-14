@@ -23,8 +23,7 @@ public class PostConstructItemBean {
         List<Item> itemList = itemRepository.findAll();
         for(int i=0;i<itemList.size();i++){
             Item item = itemList.get(i);
-            redisService.setValues(item.getItemId().toString(),
-                    String.valueOf(item.getStockQuantity()));
+            redisService.setValues(item.getItemId()+"", item.getStockQuantity()+"");
         }
     }
 }

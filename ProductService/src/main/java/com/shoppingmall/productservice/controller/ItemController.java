@@ -48,13 +48,13 @@ public class ItemController {
     public ResponseEntity<?> manageStorage(){
         List<Item> list = itemService.findAll();
         for(Item item : list){
-            redisService.setValues((item.getItemId()+""),(item.getStockQuantity()+""));
+            redisService.setValues(item.getItemId()+"", ""+item.getStockQuantity());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
     @GetMapping("/stock/{itemId}")
-    public int stockQuantity(@PathVariable(name="itemId") String itemId){
-        return Integer.parseInt(redisService.getValues(itemId));
+    public String stockQuantity(@PathVariable(name="itemId") String itemId){
+        return redisService.getValues(itemId);
     }
 
 

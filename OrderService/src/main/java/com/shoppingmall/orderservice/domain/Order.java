@@ -22,17 +22,12 @@ import static com.shoppingmall.orderservice.domain.OrderStatus.*;
 @NoArgsConstructor
 public class Order {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="order_id")
     private Long orderId;
 
-    @Version
-    private Long version;
-
     private Long userId;
 
-   // private long orderItemId;
-    //OrderItem
    @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
    @JoinColumn(name="order_item_id")
    private OrderItem orderItem;
@@ -41,10 +36,6 @@ public class Order {
 
     private OrderStatus orderStatus;
 
-    private String city;
-    private String street;
-    private String zipcode;
-
     @CreationTimestamp
     private Timestamp orderDate;//주문일자
 
@@ -52,16 +43,16 @@ public class Order {
     private Timestamp modifiedAt;
 
     public Order(long userId,DeliveryStatus deliveryStatus,OrderStatus orderStatus,
-                 OrderItem orderItem,String city,String street,String zipcode){
+                 OrderItem orderItem){
         this.userId = userId;
         this.deliveryStatus=deliveryStatus;
         this.orderStatus = orderStatus;
         this.orderItem = orderItem;
-        this.city=city;
-        this.street=street;
-        this.zipcode=zipcode;
     }
-
+public void setOrderItem(OrderItem orderItem){
+        this.orderItem = orderItem;
+        orderItem.setOrder(this);
+}
     public void updateOrderStatus(){
         switch (this.orderStatus){
             case READY:
@@ -73,6 +64,15 @@ public class Order {
 
         }
 
+    }
+    public static Order createOrder(long userId,DeliveryStatus deliveryStatus,OrderStatus orderStatus,
+                                    OrderItem orderItem) {
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setDeliveryStatus(deliveryStatus);
+        order.setOrderStatus(orderStatus);
+        order.setOrderItem(orderItem);
+        return order;
     }
     public void updateDeliveryStatus(DeliveryStatus deliveryStatus){
         this.deliveryStatus = deliveryStatus;

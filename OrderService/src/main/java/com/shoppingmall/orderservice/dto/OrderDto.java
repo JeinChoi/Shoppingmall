@@ -1,13 +1,7 @@
 package com.shoppingmall.orderservice.dto;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import com.shoppingmall.orderservice.domain.DeliveryStatus;
+import com.shoppingmall.orderservice.domain.OrderStatus;
 import lombok.*;
-import java.sql.Timestamp;
 @Getter
 @Setter
 @Builder
@@ -15,6 +9,14 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class OrderDto {
     long userId; //주문한 사용자 정보
-    long itemId;
-    int count;
+
+    long orderItemId;
+    DeliveryStatus deliveryStatus;
+    OrderStatus orderStatus;
+
+    String city;
+    String street;
+    String zipcode;
+
+
 }

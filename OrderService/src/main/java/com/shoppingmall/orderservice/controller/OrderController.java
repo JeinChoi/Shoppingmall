@@ -34,7 +34,7 @@ public class OrderController {
         //timeout 이 됐으면 다시 + 해준다
         //여기서 order 생성하는 걸로.
         //orderId 반환해야 한다
-        Long orderId = orderService.order(orderItemDto);
+        orderService.order(orderItemDto);
         //orderService.save(order);
 
         return new ResponseEntity<>(orderItemDto,HttpStatus.OK);

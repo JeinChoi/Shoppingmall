@@ -83,6 +83,7 @@ public class UserService {
                 .city(memberDto.getCity())
                 .street(memberDto.getStreet())
                 .zipcode(memberDto.getZipcode())
+                //.role("ROLE_USER")
                 .role("ROLE_GUEST")
                 .email_authentication_token(memberDto.getEmail_authentication_token())
                 .activated(true)

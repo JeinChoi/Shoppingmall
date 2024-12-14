@@ -15,7 +15,5 @@ import java.util.Optional;
 import static org.bouncycastle.asn1.x500.style.BCStyle.T;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
-   // @Lock(LockModeType.PESSIMISTIC_WRITE)
-   // @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "15000")})
     OrderItem save(OrderItem orderItem);
 }
